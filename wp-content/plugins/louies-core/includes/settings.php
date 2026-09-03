@@ -23,6 +23,17 @@ function louies_settings_fields() {
 		'hero_image_id' => array( 'Home page background photo (media ID)', '', 'Upload to Media, open it, and copy the number from the URL. Leave blank for the default.' ),
 		'gallery_ids'  => array( 'Photo strip (media IDs)', '', 'Comma separated. These are the photos of the room shown on the home page and the gallery.' ),
 		'social_image_id' => array( 'Share image (media ID)', '', 'The picture that appears when someone posts a link to the site on Facebook. 1200x630 works best.' ),
+		'sports_image_id'  => array( 'Game day background photo (media ID)', '', 'Sits behind the "Every game, every screen" band. A shot of the TV wall works best.' ),
+		'combo_hotdog_id'  => array( 'Combo poster (media ID)', '', 'The $12 combo artwork on the home page. Shown whole, so any shape works.' ),
+		'private_image_id' => array( 'Private events photo (media ID)', '', 'The photo at the top of the Book a Private Event page.' ),
+		// Optional. The site ships typeset badges rather than the leagues' own
+		// logos, which are trademarks. If Louie's is given official artwork by a
+		// distributor, dropping the media ID in here swaps the badge for it.
+		'league_nfl_id'  => array( 'NFL logo (media ID)', '', 'Optional. Leave blank to use the built-in badge.' ),
+		'league_ncaa_id' => array( 'NCAA logo (media ID)', '', 'Optional.' ),
+		'league_nba_id'  => array( 'NBA logo (media ID)', '', 'Optional.' ),
+		'league_mlb_id'  => array( 'MLB logo (media ID)', '', 'Optional.' ),
+		'league_fifa_id' => array( 'FIFA logo (media ID)', '', 'Optional.' ),
 		'seo_tagline'  => array( 'Search description', 'Karaoke Wednesday to Saturday, live music, bingo, pool and every game on 13 screens. Two happy hours daily. Rancho Cordova, one block off Highway 50.', 'The sentence Google shows under the site name. Aim for 150-160 characters.' ),
 	);
 }

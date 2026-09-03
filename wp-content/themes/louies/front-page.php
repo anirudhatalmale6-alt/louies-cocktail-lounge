@@ -11,13 +11,14 @@ get_header();
 
 $tonight = louies_tonight();
 
-// "Next up" is for the one-offs and the monthly nights. The weekly regulars
-// already have their own grid below, and three identical karaoke cards in a
-// row helps nobody.
+// "Next up" is for the one-offs and the monthly nights, and ONLY those. The
+// weekly regulars have their own grid below.
+//
+// This used to fall back to including the weeklies whenever fewer than three
+// one-offs were booked, on the theory that a thin row looked unfinished. It
+// doesn't - it just repeats the grid directly above it and buries the one date
+// that is actually news. One real event beats six filler cards.
 $upcoming = louies_upcoming( 6, array( 'unique' => true, 'skip_weekly' => true ) );
-if ( count( $upcoming ) < 3 ) {
-	$upcoming = louies_upcoming( 6, array( 'unique' => true ) );
-}
 
 $week      = louies_weekly_grid();
 $today_dow = (int) current_datetime()->format( 'w' );
@@ -232,7 +233,7 @@ $gallery   = louies_gallery_photos( 8 );
 
 			<div class="tile">
 				<h3><?php esc_html_e( 'Good and simple food', 'louies' ); ?></h3>
-				<p><?php esc_html_e( 'No full kitchen, no fuss. Hot pastrami and cheese, Angus cheeseburgers, Philly cheesesteaks, and snacks to soak up the night.', 'louies' ); ?></p>
+				<p><?php esc_html_e( 'No full kitchen, no fuss. Hot links, Angus cheeseburgers, hot dogs, Philly cheesesteaks, and snacks to soak up the night.', 'louies' ); ?></p>
 				<p><a href="<?php echo esc_url( home_url( '/menu/' ) ); ?>"><?php esc_html_e( 'See the full menu &rarr;', 'louies' ); ?></a></p>
 			</div>
 

@@ -30,7 +30,7 @@ function louies_event_meta_box( $post ) {
 	$m = louies_event_meta( $post->ID );
 	wp_nonce_field( 'louies_save_event', 'louies_event_nonce' );
 
-	$weekdays = array_filter( array_map( 'intval', array_filter( explode( ',', (string) $m['louies_weekdays'] ), 'strlen' ) ) );
+	$weekdays = louies_weekday_list( $m['louies_weekdays'] );
 	$names    = array( 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' );
 	?>
 	<style>

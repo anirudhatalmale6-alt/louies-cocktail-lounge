@@ -112,7 +112,7 @@ $sections = is_wp_error( $sections ) ? array() : $sections;
 		<div class="tile" style="margin-top:2rem">
 			<h3><?php esc_html_e( 'A note on the kitchen', 'louies' ); ?></h3>
 			<p style="margin:0">
-				<?php esc_html_e( 'Louie\'s doesn\'t have a full kitchen. What we do have is honest bar food that goes with a drink: hot pastrami and cheese, Angus cheeseburgers, Philly cheesesteaks, and plenty to snack on.', 'louies' ); ?>
+				<?php esc_html_e( 'Louie\'s doesn\'t have a full kitchen. What we do have is honest bar food that goes with a drink: hot links, Angus cheeseburgers, hot dogs, Philly cheesesteaks, and plenty to snack on.', 'louies' ); ?>
 			</p>
 		</div>
 	</div>

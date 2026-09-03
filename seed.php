@@ -93,6 +93,28 @@ function seed_item( $section_slug, $title, $price = '', $desc = '', $order = 0 )
 	return $id;
 }
 
+/**
+ * Take something back off the site.
+ *
+ * Matching on slug and updating in place makes this script safe to re-run, but
+ * it also means an item can never LEAVE the site - a second run would simply
+ * skip a row that is no longer in the list and the old post would sit there
+ * forever. Anything the bar has retired has to be named explicitly.
+ */
+function seed_retire( $post_type, $slugs ) {
+	foreach ( (array) $slugs as $slug ) {
+		$found = get_posts( array( 'post_type' => $post_type, 'name' => $slug, 'posts_per_page' => 1, 'post_status' => 'any' ) );
+		if ( $found ) {
+			wp_delete_post( $found[0]->ID, true );
+			WP_CLI::log( "retired: {$post_type} {$slug}" );
+		}
+	}
+}
+
+function seed_retire_item( $section_slug, $title ) {
+	seed_retire( 'louies_menu_item', sanitize_title( $section_slug . '-' . $title ) );
+}
+
 // ------------------------------------------------------------------ pages ---
 
 $home = seed_page( 'home', 'Home' );
@@ -252,6 +274,15 @@ seed_event( 'saturday-8-ball-tournament', "Saturday 8-Ball Tournament", array(
 	'louies_weekdays'   => '6',
 ), "<p>Every Saturday at 3pm. Ten dollars in, winner takes all. Pro tables, bragging rights and cash.</p>", array( 'Games & Tournaments' ) );
 
+seed_event( 'sunday-football-and-pool', "Sunday Football Games and Pool", array(
+	'louies_date'       => $start,
+	'louies_time_start' => '10:00',
+	'louies_time_end'   => '20:00',
+	'louies_price'      => 'FREE',
+	'louies_repeat'     => 'weekly',
+	'louies_weekdays'   => '0',
+), "<p>Sunday football on every screen, from the early games right through the afternoon, with the pool tables open all day. Jameson and a Modelo pint is $12 on Sundays.</p>", array( 'Sports' ) );
+
 seed_event( 'monday-night-football', "Monday Night Football", array(
 	'louies_date'       => '2026-09-07',
 	'louies_time_start' => '17:00',
@@ -272,47 +303,23 @@ seed_event( 'geo-jam', "Geo Jam Open Mic", array(
 	'louies_monthly_day'  => '6',
 ), "<p>Last Saturday of every month. Bring an instrument, plug in, play. Free to watch, free to join in.</p>", array( 'Live Music' ) );
 
-seed_event( 'shades-of-pink-floyd', "Shades of Pink Floyd &mdash; Live", array(
-	'louies_date'       => '2026-09-25',
-	'louies_time_start' => '21:00',
-	'louies_time_end'   => '00:00',
-	'louies_price'      => '$15',
-	'louies_repeat'     => 'none',
-	'louies_featured'   => '1',
-), "<p>Sacramento's Pink Floyd tribute back at Louie's for one night. Full light show, full set. Fifteen dollars on the door &mdash; get here early, this one fills up.</p>", array( 'Live Music' ) );
+// One-off events. The bar clears these out when they're done - only what is
+// actually booked belongs here, and a stale poster is worse than an empty
+// section. Everything else on the site is a weekly or monthly repeat and looks
+// after itself.
+//
+// (Nothing booked as of 03/09/2026 beyond the monthly Geo Jam above.)
 
-seed_event( 'dj-kid-wrench', "DJ Kid Wrench", array(
-	'louies_date'       => '2026-09-12',
-	'louies_time_start' => '22:00',
-	'louies_time_end'   => '01:00',
-	'louies_price'      => 'FREE',
-	'louies_repeat'     => 'none',
-), "<p>Kid Wrench on the decks from 10 until 1. No cover.</p>", array( 'Live Music' ) );
-
-seed_event( 'girls-night-out-the-show', "Girls Night Out: The Show", array(
-	'louies_date'       => '2026-10-10',
-	'louies_time_start' => '20:00',
-	'louies_time_end'   => '23:00',
-	'louies_price'      => '$25',
-	'louies_repeat'     => 'none',
-	'louies_featured'   => '1',
-), "<p>The touring male revue, back by demand. Doors at 8. Advance tickets recommended &mdash; this one sells out.</p>", array( 'Special Event' ) );
-
-seed_event( 'micromania-wrestling', "MicroMania Midget Wrestling", array(
-	'louies_date'       => '2026-11-14',
-	'louies_time_start' => '20:00',
-	'louies_time_end'   => '23:00',
-	'louies_price'      => '$20',
-	'louies_repeat'     => 'none',
-), "<p>MicroMania Wrestling Entertainment brings the ring to Louie's. Two shows, both nights, both wild.</p>", array( 'Special Event' ) );
-
-seed_event( 'nye-party', "New Year's Eve Party", array(
-	'louies_date'       => '2026-12-31',
-	'louies_time_start' => '20:00',
-	'louies_time_end'   => '02:00',
-	'louies_price'      => 'FREE',
-	'louies_repeat'     => 'none',
-), "<p>Live band, champagne toast at midnight, and the doors stay open until 2. No cover.</p>", array( 'Special Event' ) );
+// Taken down 03/09/2026 - these were recovered from old archived pages and are
+// not on the books. Named explicitly so a second run of this script removes
+// them rather than quietly leaving them behind.
+seed_retire( 'louies_event', array(
+	'shades-of-pink-floyd',
+	'dj-kid-wrench',
+	'girls-night-out-the-show',
+	'micromania-wrestling',
+	'nye-party',
+) );
 
 // ------------------------------------------------------------------- menu ---
 
@@ -349,20 +356,24 @@ seed_item( 'happy-hour', 'Morning happy hour', '6am - 10am', 'Every day.', 0 );
 seed_item( 'happy-hour', 'Evening happy hour', '4pm - 7pm', 'Every day.', 1 );
 
 $food = array(
+	array( 'Hot Link', '$7.00', '' ),
 	array( 'Hot Dog', '$6.00', '' ),
 	array( 'Cheeseburger', '$6.00', 'Angus. Juicy, flavorful, classic.' ),
-	array( 'Philly Cheese Steak', '$5.25', 'Loaded with all the good stuff.' ),
-	array( 'Pastrami with Cheese', '$3.75', 'Hearty and satisfying.' ),
-	array( 'Pacific Gold Jerky', '$3.00', '' ),
-	array( "Jack's Teriyaki Beef Stick", '$2.00', '' ),
-	array( 'Slim Jim', '$2.00', '' ),
-	array( 'Cracker Jacks', '$2.00', '' ),
-	array( 'Bag of Cashews', '$1.75', '' ),
-	array( 'Bag of Peanuts', '$1.50', '' ),
-	array( 'Bag of Chips', '$1.00', '' ),
+	array( 'Philly Cheese Steak', '$6.00', 'Loaded with all the good stuff.' ),
+	array( 'Pacific Gold Jerky', '$3.50', '' ),
+	// One line rather than six. The bar gave a floor price for the snack rack
+	// and nothing per item, and inventing the missing ones would put prices on
+	// the site that nobody at Louie's has ever agreed to.
+	array( 'Chips, Nuts, Slim Jims &amp; Snacks', 'from $2.00', 'Off the rack behind the bar.' ),
 );
 foreach ( $food as $i => $row ) {
 	seed_item( 'food', $row[0], $row[1], $row[2], $i );
+}
+
+// Off the menu as of 03/09/2026.
+seed_retire_item( 'food', 'Pastrami with Cheese' );
+foreach ( array( "Jack's Teriyaki Beef Stick", 'Slim Jim', 'Cracker Jacks', 'Bag of Cashews', 'Bag of Peanuts', 'Bag of Chips' ) as $gone ) {
+	seed_retire_item( 'food', $gone );
 }
 
 $draft = array( 'Blue Moon', 'Bud Light', 'Coors Light', 'Knee Deep Hoptologist', 'Modelo', 'Boneyard Beer', '805', 'Societe Brewing Co.' );

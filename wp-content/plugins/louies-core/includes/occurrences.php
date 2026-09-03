@@ -31,6 +31,35 @@ function louies_event_fields() {
 	);
 }
 
+/**
+ * Turn the stored "0,3,5" weekday string into a list of integers.
+ *
+ * Worth its own function because the obvious one-liner is wrong. Weekdays are
+ * PHP's 0-6 with SUNDAY AS ZERO, and array_filter() with no callback throws
+ * away every falsy value - so a plain array_filter() silently deletes Sunday.
+ * A Sunday-only event then produced no occurrences at all, vanished from the
+ * weekly grid, and showed its own checkbox unticked in the editor. Three
+ * different symptoms, one dropped zero.
+ *
+ * @param string $raw Comma separated weekday numbers.
+ * @return int[] Weekday numbers, 0-6, in order, no duplicates.
+ */
+function louies_weekday_list( $raw ) {
+	$days = array();
+	foreach ( explode( ',', (string) $raw ) as $piece ) {
+		$piece = trim( $piece );
+		if ( '' === $piece || ! is_numeric( $piece ) ) {
+			continue;
+		}
+		$day = (int) $piece;
+		if ( $day >= 0 && $day <= 6 && ! in_array( $day, $days, true ) ) {
+			$days[] = $day;
+		}
+	}
+	sort( $days );
+	return $days;
+}
+
 function louies_event_meta( $post_id ) {
 	$out = array();
 	foreach ( louies_event_fields() as $key => $default ) {
@@ -106,7 +135,7 @@ function louies_event_dates( $post_id, DateTimeImmutable $from, DateTimeImmutabl
 	switch ( $meta['louies_repeat'] ) {
 
 		case 'weekly':
-			$days = array_filter( array_map( 'intval', array_filter( explode( ',', (string) $meta['louies_weekdays'] ), 'strlen' ) ) );
+			$days = louies_weekday_list( $meta['louies_weekdays'] );
 			if ( ! $days ) {
 				$days = array( (int) $start->format( 'w' ) );
 			}
@@ -293,7 +322,7 @@ function louies_repeat_label( $meta ) {
 	$names = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
 
 	if ( 'weekly' === $meta['louies_repeat'] ) {
-		$days = array_filter( array_map( 'intval', array_filter( explode( ',', (string) $meta['louies_weekdays'] ), 'strlen' ) ) );
+		$days = louies_weekday_list( $meta['louies_weekdays'] );
 		sort( $days );
 		$labels = array();
 		foreach ( $days as $d ) {

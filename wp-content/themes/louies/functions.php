@@ -104,7 +104,7 @@ function louies_weekly_grid() {
 		'meta_query'     => array( array( 'key' => '_louies_repeat', 'value' => 'weekly' ) ),
 	) ) as $post ) {
 		$m    = louies_event_meta( $post->ID );
-		$days = array_filter( array_map( 'intval', array_filter( explode( ',', (string) $m['louies_weekdays'] ), 'strlen' ) ) );
+		$days = louies_weekday_list( $m['louies_weekdays'] );
 		foreach ( $days as $d ) {
 			if ( isset( $grid[ $d ] ) ) {
 				$grid[ $d ][] = array( 'post' => $post, 'meta' => $m );
@@ -271,6 +271,14 @@ add_action( 'init', function () {
 	remove_action( 'wp_head', 'wp_generator' );
 	remove_action( 'wp_head', 'wlwmanifest_link' );
 	remove_action( 'wp_head', 'rsd_link' );
+
+	// The emoji detection script is a separate JS request on every page load to
+	// decide whether the browser can draw emoji. It can. Nothing on this site
+	// uses them, and it is the only script here that isn't ours.
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
 } );
 
 /**

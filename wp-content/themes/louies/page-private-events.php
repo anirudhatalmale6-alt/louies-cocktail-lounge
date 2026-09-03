@@ -60,7 +60,7 @@ $hero = louies_photo_url( 'private_image_id', 245, 'louies-hero' );
 			</div>
 			<div class="tile">
 				<h3><?php esc_html_e( 'Food &amp; a full bar', 'louies' ); ?></h3>
-				<p><?php esc_html_e( 'Burgers, hot dogs, Philly cheesesteaks and pastrami, plus one of the deepest back bars in Rancho Cordova.', 'louies' ); ?></p>
+				<p><?php esc_html_e( 'Burgers, hot dogs, hot links and Philly cheesesteaks, plus one of the deepest back bars in Rancho Cordova.', 'louies' ); ?></p>
 			</div>
 		</div>
 	</div>

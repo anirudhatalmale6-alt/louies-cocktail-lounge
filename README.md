@@ -9,7 +9,7 @@ Four pieces:
 |---|---|
 | `wp-content/themes/louies` | The look. Templates, CSS, the one small JS file. |
 | `wp-content/plugins/louies-core` | The content. Events, recurrence, the food & drink menu, the bar's details, and the SEO. |
-| `photos/` | The 13 photographs of the bar recovered from the Wayback Machine, cleaned up and captioned. Exterior, karaoke stage, tables with the game on, the back bar, the pool room, and crowd shots. |
+| `photos/` | Photographs of the bar, cleaned up and captioned. Two are the bar's own — the building at dusk and the neon sign at night with customers outside. The rest were recovered from the Wayback Machine: the karaoke stage, tables with the game on, the back bar, the pool room, and crowd shots. |
 | `brand/` | The logo converted out of the supplied CMYK `.eps` into web-ready RGB — an SVG that stays sharp at any size, PNGs at three widths, a 1200×630 share card and a 512px icon. All transparent except the share card. |
 
 Content lives in the plugin on purpose. If the site is ever restyled, every
@@ -48,6 +48,25 @@ what a bar needs and nothing more:
 Dates are worked out when the page loads. Nothing is pre-generated, so there is
 no "regenerate recurring events" button to remember and nothing to go stale.
 
+### Proving it
+
+`tests/recurrence-tests.php` is 24 assertions over the repeat logic. From the
+WordPress root:
+
+```
+wp eval-file tests/recurrence-tests.php
+```
+
+It covers weekly, weekly-with-an-end-date, skipped dates, last-Saturday-of-the-
+month, a "5th Sunday" in a month that hasn't got one, one-offs, and that an
+open-ended weekly event actually terminates rather than looping forever.
+
+It also covers **Sunday specifically**, because Sunday is weekday `0` and the
+first version of the parser used `array_filter()`, which throws away every falsy
+value — so a Sunday event produced no dates, never appeared in the weekly grid,
+and showed its own checkbox unticked in the editor. `louies_weekday_list()`
+exists to make that impossible to write again.
+
 ---
 
 ## Adding a night
@@ -58,6 +77,12 @@ week* and choose the days. Save. That's the whole job.
 The Events list shows *Next: Fri, Sep 4* for repeating nights rather than the
 date the series began — so the list reads like a diary, not a database.
 
+**"Next up" on the home page shows only the one-offs and the monthly nights** —
+the bands, the fights, the parties, Geo Jam. The weekly regulars are already in
+the grid directly above it, and repeating them underneath just pushes the one
+date that is actually news off the screen. If nothing is booked, the section
+says so rather than padding itself out with karaoke.
+
 ## Changing the menu
 
 **Food & Drink.** Each item is a title plus a price. Group them with **Menu
@@ -66,6 +91,19 @@ Use the *Order* field to move an item up or down within its section.
 
 A section where no item has a price renders as a tidy multi-column bottle list
 instead of a price list — that's how the back-bar spirits display.
+
+## The league badges on the game-day section
+
+NFL, NCAA, NBA, MLB and FIFA appear as **typeset badges in the bar's own
+colours, not the leagues' official logos**. Those logos are registered
+trademarks; naming a league to say which games you show is ordinary use, but
+reproducing its artwork on a commercial site is not something to do without a
+licence, so the site doesn't.
+
+If Louie's is supplied official artwork — distributors and satellite providers
+often give bars a media pack — upload each file and paste its media ID into
+**Bar Details → NFL logo** and so on. The badge is replaced by the image and
+nothing else changes. Leave the fields blank and the typeset badges stay.
 
 ## Phone, address, hours
 
