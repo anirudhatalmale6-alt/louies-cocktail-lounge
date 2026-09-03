@@ -168,6 +168,10 @@ $gallery   = louies_gallery_photos( 8 );
 	</div>
 </section>
 
+<?php get_template_part( 'parts/sports' ); ?>
+
+<?php get_template_part( 'parts/food' ); ?>
+
 <?php if ( $gallery ) : ?>
 	<section class="section" id="photos">
 		<div class="wrap">

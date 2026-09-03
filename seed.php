@@ -153,6 +153,8 @@ seed_page( 'contact', 'Contact & Venue Hire', "<p>Quickest way to reach us is th
 
 seed_page( 'gallery', 'Photos', "<p>The bar, the pool room, karaoke nights and live music at Louie's Cocktail Lounge in Rancho Cordova.</p>", 'page-gallery.php' );
 
+seed_page( 'private-events', 'Book a Private Event', "<p>Louie&#8217;s has hosted birthdays, celebrations of life, club runs, car shows, fundraisers and company parties. The stage, the dance floor, the patio and a hundred parking spaces are all yours.</p>", 'page-private-events.php' );
+
 seed_page( 'privacy-policy', 'Privacy Policy', "<p>We collect only what you send us through the contact form on this site: your name, email address, phone number if you give one, and your message. We use it to reply to you and nothing else. We do not sell it, share it or add you to a mailing list.</p><p>This site uses no advertising or tracking cookies. Embedded Google Maps is provided by Google and subject to their own privacy policy.</p><p>Want your details removed from our records? Call the bar and ask.</p>" );
 
 // The front page is the theme's front-page.php, so 'home' just anchors the menu.
@@ -178,7 +180,7 @@ $louies_settings = array_merge( (array) get_option( 'louies_settings', array() )
 	'maps_query' => '3030 Mather Field Rd, Rancho Cordova, CA 95670',
 	'facebook'   => '',
 	'instagram'  => '',
-	'email'      => 'info@louiescocktails.com',
+	'email'      => 'louiescocktails@gmail.com',
 	'notice'     => '',
 ) );
 update_option( 'louies_settings', $louies_settings );

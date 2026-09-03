@@ -135,6 +135,27 @@ function louies_hero_image() {
 }
 
 /**
+ * A picture chosen in Bar Details, with a sensible fallback if the setting is
+ * blank or points at something that has been deleted.
+ */
+function louies_photo_url( $setting, $fallback_id = 0, $size = 'louies-card' ) {
+	$id = (int) louies_option( $setting, 0 );
+	if ( $id ) {
+		$url = wp_get_attachment_image_url( $id, $size );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	if ( $fallback_id ) {
+		$url = wp_get_attachment_image_url( $fallback_id, $size );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return get_theme_file_uri( 'assets/img/hero.jpg' );
+}
+
+/**
  * Photos of the room, for the front-page strip and the gallery page.
  *
  * Reads a "Gallery" media category if the bar has tagged photos into one,
@@ -209,8 +230,20 @@ function louies_handle_contact() {
 		exit;
 	}
 
+	// The private-events form posts a few extra fields. Anything sent has to end
+	// up in the email - a field that silently disappears is worse than no field.
+	$extra = array(
+		'Date wanted' => sanitize_text_field( wp_unslash( $_POST['louies_event_date'] ?? '' ) ),
+		'Guests'      => sanitize_text_field( wp_unslash( $_POST['louies_guests'] ?? '' ) ),
+		'Occasion'    => sanitize_text_field( wp_unslash( $_POST['louies_event_type'] ?? '' ) ),
+	);
+
 	$to   = louies_option( 'email' );
-	$body = "Name: {$name}\nEmail: {$email}\nPhone: {$phone}\n\n{$message}\n";
+	$body = "Name: {$name}\nEmail: {$email}\nPhone: {$phone}\n";
+	foreach ( array_filter( $extra ) as $label => $value ) {
+		$body .= "{$label}: {$value}\n";
+	}
+	$body .= "\n{$message}\n";
 
 	$sent = wp_mail(
 		$to,

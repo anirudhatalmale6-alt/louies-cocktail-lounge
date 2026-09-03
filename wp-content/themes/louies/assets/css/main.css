@@ -757,6 +757,156 @@ p { margin: 0 0 1.15em; }
 }
 
 /* --------------------------------------------------------------------------
+   Game day
+   -------------------------------------------------------------------------- */
+.gameday {
+	position: relative;
+	overflow: hidden;
+	background: var(--plum);
+}
+.gameday::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: var(--gameday-image);
+	background-size: cover;
+	background-position: center;
+	opacity: .3;
+}
+.gameday::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(36,16,24,.86) 0%, rgba(36,16,24,.7) 45%, rgba(36,16,24,.93) 100%);
+}
+.gameday > * { position: relative; z-index: 2; }
+
+.screen-stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: .8rem;
+	list-style: none;
+	margin: 0 0 2.2rem;
+	padding: 0;
+}
+.screen-stats li {
+	background: rgba(253, 247, 234, .09);
+	border: 1px solid rgba(253, 247, 234, .2);
+	border-radius: var(--radius);
+	padding: .9rem 1.1rem;
+	text-align: center;
+}
+.screen-stats b {
+	display: block;
+	font-family: var(--display);
+	font-size: 2.5rem;
+	font-weight: 900;
+	line-height: 1;
+	color: var(--butter);
+}
+.screen-stats span {
+	display: block;
+	margin-top: .25rem;
+	font-size: .82rem;
+	font-weight: 600;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+	color: var(--on-dark-2);
+}
+
+.sport-grid { display: grid; gap: 1.1rem; }
+.sport-card {
+	background: rgba(253, 247, 234, .07);
+	border: 1px solid rgba(253, 247, 234, .18);
+	border-top: 4px solid var(--teal-soft);
+	border-radius: var(--radius);
+	padding: 1.3rem 1.4rem;
+}
+.sport-card:nth-child(2) { border-top-color: var(--coral); }
+.sport-card:nth-child(3) { border-top-color: var(--butter); }
+.sport-card:nth-child(4) { border-top-color: var(--lime); }
+.sport-icon { width: 40px; height: 40px; color: var(--butter); margin-bottom: .7rem; }
+.sport-card h3 { font-size: 1.55rem; margin: 0 0 .25rem; color: #fff; }
+.sport-when {
+	font-size: .78rem;
+	font-weight: 700;
+	letter-spacing: .13em;
+	text-transform: uppercase;
+	color: var(--teal-soft);
+	margin: 0 0 .6rem;
+}
+.sport-blurb { margin: 0; color: var(--on-dark-2); font-size: 1rem; }
+
+/* --------------------------------------------------------------------------
+   Food
+   -------------------------------------------------------------------------- */
+.combo {
+	display: grid;
+	gap: 1.6rem;
+	background: #fff;
+	border: 1px solid var(--sand-line);
+	border-radius: var(--radius);
+	overflow: hidden;
+	box-shadow: var(--shadow-lg);
+	margin-bottom: 1.8rem;
+}
+/* These are complete posters, not crop-safe photographs. No aspect-ratio and
+   no object-fit - let them render whole so the "$12 COMBO" artwork is never
+   sliced through. */
+.combo-shots { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--sand-3); align-self: stretch; }
+.combo-shots img { display: block; width: 100%; height: auto; align-self: start; }
+.combo-copy { padding: 0 1.5rem 1.8rem; }
+.combo-flag {
+	display: inline-block;
+	background: var(--wine);
+	color: #fff;
+	font-family: var(--display);
+	font-size: 1rem;
+	font-weight: 800;
+	letter-spacing: .13em;
+	text-transform: uppercase;
+	padding: .25rem .85rem;
+	border-radius: 999px;
+	margin-bottom: .8rem;
+}
+.combo-copy h3 { font-size: clamp(1.5rem, 3.4vw, 1.95rem); margin: 0 0 .3rem; }
+.combo-price {
+	font-family: var(--display);
+	font-size: clamp(4rem, 14vw, 6rem);
+	font-weight: 900;
+	line-height: .85;
+	color: var(--coral-deep);
+	margin: 0 0 .6rem;
+}
+.combo-copy p:not(.combo-price) { color: var(--ink-soft); }
+
+.food-strip {
+	display: grid;
+	gap: .7rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.food-strip li {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: .7rem;
+	background: #fff;
+	border: 1px solid var(--sand-line);
+	border-radius: 999px;
+	padding: .65rem 1.2rem;
+}
+.food-strip b { font-weight: 600; }
+.food-strip span {
+	font-family: var(--display);
+	font-size: 1.3rem;
+	font-weight: 800;
+	color: var(--coral-deep);
+	white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
    Info tiles
    -------------------------------------------------------------------------- */
 .tiles { display: grid; gap: 1.3rem; }
@@ -863,6 +1013,8 @@ p { margin: 0 0 1.15em; }
 	box-shadow: 0 0 0 3px rgba(47,157,146,.2);
 }
 .contact-form textarea { min-height: 160px; resize: vertical; }
+.field-row { display: grid; gap: 1.1rem; }
+@media (min-width: 560px) { .field-row { grid-template-columns: 1fr 1fr; } }
 .hp-field { position: absolute; left: -9999px; }
 
 .form-note {
@@ -1030,6 +1182,13 @@ p { margin: 0 0 1.15em; }
 	.event-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	.findus-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
 	.week { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.sport-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.screen-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.food-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.combo { grid-template-columns: 1fr 1fr; gap: 0; align-items: center; }
+	.combo-shots { align-self: center; }
+	.combo-shots { grid-template-columns: 1fr 1fr; }
+	.combo-copy { padding: 2rem; }
 }
 
 @media (min-width: 900px) {
@@ -1067,6 +1226,9 @@ p { margin: 0 0 1.15em; }
 	.menu-nav { top: 77px; }
 	.findus-grid { grid-template-columns: .9fr 1.1fr; gap: 3rem; }
 	.photo-grid { grid-template-columns: repeat(4, 1fr); }
+	.sport-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.food-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.combo { grid-template-columns: .95fr 1.05fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

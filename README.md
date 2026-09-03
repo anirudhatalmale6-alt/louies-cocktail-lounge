@@ -3,12 +3,13 @@
 For **louiescocktails.com**. Mobile-first, tap-to-call, Google Maps, local SEO,
 and recurring events that you create **once**.
 
-Three pieces:
+Four pieces:
 
 | | |
 |---|---|
 | `wp-content/themes/louies` | The look. Templates, CSS, the one small JS file. |
 | `wp-content/plugins/louies-core` | The content. Events, recurrence, the food & drink menu, the bar's details, and the SEO. |
+| `photos/` | The 13 photographs of the bar recovered from the Wayback Machine, cleaned up and captioned. Exterior, karaoke stage, tables with the game on, the back bar, the pool room, and crowd shots. |
 | `brand/` | The logo converted out of the supplied CMYK `.eps` into web-ready RGB — an SVG that stays sharp at any size, PNGs at three widths, a 1200×630 share card and a 512px icon. All transparent except the share card. |
 
 Content lives in the plugin on purpose. If the site is ever restyled, every
@@ -105,6 +106,7 @@ for "Closed Thanksgiving" or "Kitchen closed tonight". Leave it blank to hide it
    | About Us | `about` | *(default)* |
    | Contact & Venue Hire | `contact` | Contact |
    | Photos | `gallery` | Photo Gallery |
+   | Book a Private Event | `private-events` | Private Events |
 
    **Settings → Reading**: front page displays a static page → *Home*.
 7. **Appearance → Menus**: build the Primary and Footer menus.
@@ -160,10 +162,16 @@ bar and stops there:
 3. Put the site link on the Facebook and Instagram profiles, then paste those
    URLs into **Bar Details** so they go into the structured data as `sameAs`.
 
-## The contact form
+## The contact forms
 
-Built into the theme. No plugin, no third-party service, no data leaving the
-site. It has a honeypot field, a nonce, and server-side validation.
+Two of them, both built into the theme. No plugin, no third-party service, no
+data leaving the site. Each has a honeypot field, a nonce, and server-side
+validation.
+
+* **Contact** — name, email, phone, subject, message.
+* **Private Events** — adds the date wanted, rough headcount and the occasion.
+  Those three extra fields are appended to the email body, so nothing a customer
+  types is silently dropped.
 
 It sends with `wp_mail()`. On most shared hosting that works out of the box; if
 messages don't arrive, the host is blocking PHP mail and you'll want an SMTP
