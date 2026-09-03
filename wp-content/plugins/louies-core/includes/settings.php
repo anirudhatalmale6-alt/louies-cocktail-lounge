@@ -18,8 +18,12 @@ function louies_settings_fields() {
 		'maps_query'   => array( 'Google Maps search', '3030 Mather Field Rd, Rancho Cordova, CA 95670', 'What the map and the Directions button look up.' ),
 		'facebook'     => array( 'Facebook URL', '', '' ),
 		'instagram'    => array( 'Instagram URL', '', '' ),
-		'email'        => array( 'Contact email', 'info@louiescocktaillounge.net', 'Where the contact form sends to.' ),
+		'email'        => array( 'Contact email', 'info@louiescocktails.com', 'Where the contact form sends to.' ),
 		'notice'       => array( 'Banner message', '', 'Optional. Shows a strip across the top of every page - handy for "Closed Thanksgiving".' ),
+		'hero_image_id' => array( 'Home page background photo (media ID)', '', 'Upload to Media, open it, and copy the number from the URL. Leave blank for the default.' ),
+		'gallery_ids'  => array( 'Photo strip (media IDs)', '', 'Comma separated. These are the photos of the room shown on the home page and the gallery.' ),
+		'social_image_id' => array( 'Share image (media ID)', '', 'The picture that appears when someone posts a link to the site on Facebook. 1200x630 works best.' ),
+		'seo_tagline'  => array( 'Search description', 'Karaoke Wednesday to Saturday, live music, bingo, pool and every game on 13 screens. Two happy hours daily. Rancho Cordova, one block off Highway 50.', 'The sentence Google shows under the site name. Aim for 150-160 characters.' ),
 	);
 }
 

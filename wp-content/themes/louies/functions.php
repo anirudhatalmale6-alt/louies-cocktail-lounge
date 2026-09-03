@@ -121,6 +121,46 @@ function louies_weekly_grid() {
 }
 
 /**
+ * Hero background. The bar can swap it from Bar Details without touching code.
+ */
+function louies_hero_image() {
+	$id = (int) louies_option( 'hero_image_id', 0 );
+	if ( $id ) {
+		$url = wp_get_attachment_image_url( $id, 'louies-hero' );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return get_theme_file_uri( 'assets/img/hero.jpg' );
+}
+
+/**
+ * Photos of the room, for the front-page strip and the gallery page.
+ *
+ * Reads a "Gallery" media category if the bar has tagged photos into one,
+ * otherwise falls back to the newest images in the media library. Either way
+ * it never returns an event poster - those are artwork, not photographs of
+ * the place, and mixing them makes the bar look like a flyer.
+ */
+function louies_gallery_photos( $limit = 8 ) {
+	$ids = array_filter( array_map( 'intval', explode( ',', (string) louies_option( 'gallery_ids' ) ) ) );
+
+	$photos = array();
+	foreach ( array_slice( $ids, 0, $limit ) as $id ) {
+		$url = wp_get_attachment_image_url( $id, 'louies-card' );
+		if ( ! $url ) {
+			continue;
+		}
+		$photos[] = array(
+			'url'     => $url,
+			'alt'     => get_post_meta( $id, '_wp_attachment_image_alt', true ) ?: get_the_title( $id ),
+			'caption' => wp_get_attachment_caption( $id ),
+		);
+	}
+	return $photos;
+}
+
+/**
  * Poster image for an event, falling back to the first image in its type.
  */
 function louies_event_image( $post_id, $size = 'louies-card' ) {

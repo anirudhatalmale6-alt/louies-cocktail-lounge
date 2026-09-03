@@ -1,17 +1,34 @@
 # Louie's Cocktail Lounge — WordPress site
 
-A rebuild of louiescocktaillounge.net: mobile-first, tap-to-call, Google Maps, and
-recurring events that you create **once**.
+For **louiescocktails.com**. Mobile-first, tap-to-call, Google Maps, local SEO,
+and recurring events that you create **once**.
 
-Two pieces:
+Three pieces:
 
 | | |
 |---|---|
 | `wp-content/themes/louies` | The look. Templates, CSS, the one small JS file. |
-| `wp-content/plugins/louies-core` | The content. Events, recurrence, the food & drink menu, the bar's details. |
+| `wp-content/plugins/louies-core` | The content. Events, recurrence, the food & drink menu, the bar's details, and the SEO. |
+| `brand/` | The logo converted out of the supplied CMYK `.eps` into web-ready RGB — an SVG that stays sharp at any size, PNGs at three widths, a 1200×630 share card and a 512px icon. All transparent except the share card. |
 
 Content lives in the plugin on purpose. If the site is ever restyled, every
 event and every price survives it.
+
+## Colours
+
+Sampled from the badge logo rather than invented, so the site and the sign
+match:
+
+| | | |
+|---|---|---|
+| Plum | `#241018` | Dark bands, footer, headings |
+| Teal | `#2f9d92` | Primary buttons, links, "open now" |
+| Coral | `#ef8b2c` | Prices, date chips, the call button |
+| Sunset cream | `#f0e49c` | Highlights on dark |
+| Sand | `#fdf7ea` | Page background |
+
+The page is **warm and light by default**; plum is an accent band, never the
+whole site.
 
 ---
 
@@ -87,6 +104,7 @@ for "Closed Thanksgiving" or "Kitchen closed tonight". Leave it blank to hide it
    | Food & Drink | `menu` | Food & Drink Menu |
    | About Us | `about` | *(default)* |
    | Contact & Venue Hire | `contact` | Contact |
+   | Photos | `gallery` | Photo Gallery |
 
    **Settings → Reading**: front page displays a static page → *Home*.
 7. **Appearance → Menus**: build the Primary and Footer menus.
@@ -109,6 +127,39 @@ on slug and updated in place rather than duplicated.
 
 ---
 
+## SEO
+
+No Yoast, no subscription. `includes/seo.php` does the parts that matter for a
+bar and stops there:
+
+* **Titles and descriptions** per page, written for a search result rather than
+  "Home | Site". Descriptions are trimmed to 160 characters on a word boundary.
+* **`BarOrPub` structured data** — name, address, phone, price range, opening
+  hours (including the 6am–2am overnight wrap) and amenities: karaoke, live
+  music, pool, darts, patio, free parking, WiFi, ATM.
+* **`Event` structured data** for every upcoming occurrence, so Google can list
+  what's on directly in the results. Overnight finishes get the following day's
+  date on `endDate`, which is what the spec requires.
+* **Open Graph and Twitter cards**, so a link posted to Facebook shows the logo
+  card instead of a blank box.
+* **Canonical URLs** on every page.
+* **Sitemap** at `/wp-sitemap.xml`, linked from `robots.txt`. Menu items, menu
+  sections and author archives are excluded — they'd only dilute the pages that
+  matter.
+* **Finished events go `noindex, follow`** automatically, so the site doesn't
+  fill up with dead pages competing against the live ones.
+
+### After it goes live
+
+1. Add the site to [Google Search Console](https://search.google.com/search-console)
+   and submit `https://louiescocktails.com/wp-sitemap.xml`.
+2. Claim the **Google Business Profile** for the bar. For a venue this is worth
+   more than everything above put together — it is what fills the map pack when
+   somebody searches "karaoke near me". Make the name, address, phone and hours
+   *character-for-character identical* to the site.
+3. Put the site link on the Facebook and Instagram profiles, then paste those
+   URLs into **Bar Details** so they go into the structured data as `sameAs`.
+
 ## The contact form
 
 Built into the theme. No plugin, no third-party service, no data leaving the
@@ -120,6 +171,17 @@ plugin (WP Mail SMTP, free) pointed at the bar's mailbox. Where it sends is set
 in **Bar Details → Contact email**.
 
 ---
+
+## Hosting
+
+WordPress.com's cheaper plans **cannot run this**. Custom themes and plugins
+need their **Business** plan (about $300/year billed annually). Everything here
+is a normal WordPress theme and plugin, so any host that gives you real
+WordPress will do — a $5–12/month plan from a normal host runs it comfortably.
+
+**Storage:** the whole site — WordPress, this theme, the plugin, and the images
+— is well under 200 MB. 13 GB is far more than enough; a few hundred
+full-resolution event posters would still leave most of it free.
 
 ## Notes
 

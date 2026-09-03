@@ -20,6 +20,7 @@ require_once LOUIES_CORE_DIR . 'includes/occurrences.php';
 require_once LOUIES_CORE_DIR . 'includes/meta-boxes.php';
 require_once LOUIES_CORE_DIR . 'includes/admin-columns.php';
 require_once LOUIES_CORE_DIR . 'includes/settings.php';
+require_once LOUIES_CORE_DIR . 'includes/seo.php';
 
 register_activation_hook( __FILE__, function () {
 	louies_register_post_types();

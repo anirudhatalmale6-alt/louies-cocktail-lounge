@@ -3,8 +3,8 @@
  * Front page.
  *
  * Order is deliberate and mobile-first: what's on tonight, then the weekly
- * regulars, then what's coming up, then the room itself. Someone deciding
- * where to go gets their answer before they scroll.
+ * regulars, then what's coming up, then the room itself, then photos, and
+ * the map and phone number anchored at the very bottom.
  */
 
 get_header();
@@ -19,18 +19,19 @@ if ( count( $upcoming ) < 3 ) {
 	$upcoming = louies_upcoming( 6, array( 'unique' => true ) );
 }
 
-$week        = louies_weekly_grid();
-$today_dow   = (int) current_datetime()->format( 'w' );
-$day_names   = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
-$hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
+$week      = louies_weekly_grid();
+$today_dow = (int) current_datetime()->format( 'w' );
+$day_names = array( 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
+$hero_img  = louies_hero_image();
+$gallery   = louies_gallery_photos( 8 );
 ?>
 
-<section class="hero" style="--hero-image:url('<?php echo esc_url( $hero_image ); ?>')">
+<section class="hero" style="--hero-image:url('<?php echo esc_url( $hero_img ); ?>')">
 	<div class="wrap">
-		<p class="eyebrow"><?php esc_html_e( 'Rancho Cordova &middot; Just off Highway 50', 'louies' ); ?></p>
+		<p class="eyebrow" style="color:var(--butter)"><?php esc_html_e( 'Rancho Cordova &middot; One block off Highway 50, exit 15', 'louies' ); ?></p>
 
 		<h1 class="hero-title">
-			<span class="neon"><?php esc_html_e( 'Louie\'s', 'louies' ); ?></span>
+			<?php esc_html_e( 'Louie\'s', 'louies' ); ?>
 			<span class="script"><?php esc_html_e( 'Cocktail Lounge', 'louies' ); ?></span>
 		</h1>
 
@@ -43,16 +44,42 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 		</ul>
 
 		<div class="hero-actions">
-			<a class="btn" href="<?php echo esc_url( louies_phone_link() ); ?>"><?php esc_html_e( 'Call the bar', 'louies' ); ?></a>
+			<a class="btn btn-coral" href="<?php echo esc_url( louies_phone_link() ); ?>"><?php echo esc_html( louies_option( 'phone' ) ); ?></a>
 			<a class="btn btn-ghost" href="<?php echo esc_url( louies_directions_link() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Directions', 'louies' ); ?></a>
 		</div>
+	</div>
+</section>
 
-		<div class="hero-facts">
-			<div><strong><?php esc_html_e( 'Open daily', 'louies' ); ?></strong> &middot; <?php echo wp_kses_post( louies_option( 'hours' ) ); ?></div>
-			<div><strong><?php esc_html_e( 'Happy hour', 'louies' ); ?></strong> &middot; <?php echo wp_kses_post( louies_option( 'happy_hour' ) ); ?></div>
-			<div><strong><?php echo esc_html( louies_option( 'address_1' ) ); ?></strong> <?php echo esc_html( louies_option( 'address_2' ) ); ?></div>
-			<div><strong><?php esc_html_e( 'Free parking', 'louies' ); ?></strong> &middot; <?php esc_html_e( '100 secure spaces out front', 'louies' ); ?></div>
-		</div>
+<section class="fact-strip">
+	<div class="wrap">
+		<dl class="fact-cards">
+			<div class="fact-card">
+				<dt><?php esc_html_e( 'Open daily', 'louies' ); ?></dt>
+				<dd><?php echo wp_kses_post( louies_option( 'hours' ) ); ?><small><?php esc_html_e( 'Seven days a week, all year.', 'louies' ); ?></small></dd>
+			</div>
+			<div class="fact-card">
+				<dt><?php esc_html_e( 'Happy hour', 'louies' ); ?></dt>
+				<dd><?php echo wp_kses_post( louies_option( 'happy_hour' ) ); ?><small><?php esc_html_e( 'Twice a day, every day.', 'louies' ); ?></small></dd>
+			</div>
+			<div class="fact-card">
+				<dt><?php esc_html_e( 'Find us', 'louies' ); ?></dt>
+				<dd>
+					<a href="<?php echo esc_url( louies_directions_link() ); ?>" target="_blank" rel="noopener">
+						<?php echo esc_html( louies_option( 'address_1' ) ); ?>
+						<small><?php echo esc_html( louies_option( 'address_2' ) ); ?> &middot; <?php esc_html_e( '100 free parking spaces', 'louies' ); ?></small>
+					</a>
+				</dd>
+			</div>
+			<div class="fact-card">
+				<dt><?php esc_html_e( 'Call the bar', 'louies' ); ?></dt>
+				<dd>
+					<a href="<?php echo esc_url( louies_phone_link() ); ?>">
+						<?php echo esc_html( louies_option( 'phone' ) ); ?>
+						<small><?php esc_html_e( 'Tap to call &mdash; someone always picks up.', 'louies' ); ?></small>
+					</a>
+				</dd>
+			</div>
+		</dl>
 	</div>
 </section>
 
@@ -89,7 +116,7 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 	</div>
 </section>
 
-<section class="section section-alt" id="week">
+<section class="section" id="week">
 	<div class="wrap">
 		<div class="section-head">
 			<p class="eyebrow"><?php esc_html_e( 'Every single week', 'louies' ); ?></p>
@@ -113,7 +140,7 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 							<?php endforeach; ?>
 						</ul>
 					<?php else : ?>
-						<p class="week-quiet"><?php esc_html_e( 'Bar &amp; TVs', 'louies' ); ?></p>
+						<p class="week-quiet"><?php esc_html_e( 'Bar, TVs &amp; pool', 'louies' ); ?></p>
 					<?php endif; ?>
 				</div>
 			<?php endfor; ?>
@@ -121,7 +148,7 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 	</div>
 </section>
 
-<section class="section" id="upcoming">
+<section class="section section-sand" id="upcoming">
 	<div class="wrap">
 		<div class="section-head section-head-row">
 			<div>
@@ -141,7 +168,32 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 	</div>
 </section>
 
-<section class="section section-alt" id="the-room">
+<?php if ( $gallery ) : ?>
+	<section class="section" id="photos">
+		<div class="wrap">
+			<div class="section-head section-head-row">
+				<div>
+					<p class="eyebrow"><?php esc_html_e( 'Have a look round', 'louies' ); ?></p>
+					<h2><?php esc_html_e( 'Inside Louie\'s', 'louies' ); ?></h2>
+				</div>
+				<a class="btn btn-ghost btn-sm" href="<?php echo esc_url( home_url( '/gallery/' ) ); ?>"><?php esc_html_e( 'More photos', 'louies' ); ?></a>
+			</div>
+
+			<div class="photo-grid">
+				<?php foreach ( $gallery as $i => $photo ) : ?>
+					<figure class="<?php echo 0 === $i ? 'is-wide' : ''; ?>">
+						<img src="<?php echo esc_url( $photo['url'] ); ?>" alt="<?php echo esc_attr( $photo['alt'] ); ?>" loading="lazy">
+						<?php if ( $photo['caption'] ) : ?>
+							<figcaption><?php echo esc_html( $photo['caption'] ); ?></figcaption>
+						<?php endif; ?>
+					</figure>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+<?php endif; ?>
+
+<section class="section section-plum on-plum" id="the-room">
 	<div class="wrap">
 		<div class="section-head">
 			<p class="eyebrow"><?php esc_html_e( 'The room', 'louies' ); ?></p>
@@ -198,30 +250,9 @@ $hero_image  = get_theme_file_uri( 'assets/img/hero.jpg' );
 	</div>
 </section>
 
-<section class="section" id="find-us">
-	<div class="wrap">
-		<div class="split split-wide">
-			<div>
-				<p class="eyebrow"><?php esc_html_e( 'Find us', 'louies' ); ?></p>
-				<h2><?php esc_html_e( 'One block off exit 15', 'louies' ); ?></h2>
-				<p class="lede">
-					<?php esc_html_e( 'Straight off Highway 50, one block north of Mather Field Rd. Easy on, easy off, and a hundred parking spaces right in front &mdash; no crawling through city traffic to get here.', 'louies' ); ?>
-				</p>
-				<p style="font-family:var(--display);font-size:1.5rem;font-weight:800;line-height:1.2;margin-bottom:1.2rem">
-					<?php echo esc_html( louies_option( 'address_1' ) ); ?><br>
-					<?php echo esc_html( louies_option( 'address_2' ) ); ?>
-				</p>
-				<div class="hero-actions">
-					<a class="btn" href="<?php echo esc_url( louies_directions_link() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open in maps', 'louies' ); ?></a>
-					<a class="btn btn-ghost" href="<?php echo esc_url( louies_phone_link() ); ?>"><?php echo esc_html( louies_option( 'phone' ) ); ?></a>
-				</div>
-			</div>
-
-			<div class="map-frame">
-				<iframe src="<?php echo esc_url( louies_map_embed_src() ); ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="<?php esc_attr_e( 'Map to Louie\'s Cocktail Lounge', 'louies' ); ?>"></iframe>
-			</div>
-		</div>
-	</div>
-</section>
+<?php
+// Map and phone anchored at the very bottom of the home page, as requested.
+get_template_part( 'parts/find-us' );
+?>
 
 <?php get_footer(); ?>

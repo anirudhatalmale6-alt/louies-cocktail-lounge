@@ -102,14 +102,26 @@ seed_page( 'events', "What's On", "Karaoke four nights a week, live bands, bingo
 seed_page( 'menu', 'Food & Drink', "Two happy hours a day, a different special every night of the week, and a back bar that runs deeper than most places twice our size.", 'page-menu.php' );
 
 seed_page( 'about', 'About Us', <<<'HTML'
-<p>Welcome to Louie's Cocktail Lounge, just off Highway 50 in Rancho Cordova. Our doors are open from 6am to 2am, every single day.</p>
+<p>Louie's Cocktail Lounge is a karaoke bar, live music venue and sports bar in <strong>Rancho Cordova</strong>, one block north of Mather Field Rd just off Highway 50 at exit 15. Our doors are open from 6am to 2am, every single day of the year.</p>
 
-<p>Two happy hours daily &mdash; 6 to 10 in the morning and 4 to 7 in the evening. Our stage is worked by some of the best KJs in Sacramento, and with a professional live stage and a proper dance floor, the spotlight is yours for the taking.</p>
+<p>Two happy hours daily &mdash; 6 to 10 in the morning and 4 to 7 in the evening &mdash; with a different drink special every night of the week. Our stage is worked by some of the best KJs in Sacramento, and with a professional live stage and a proper dance floor, the spotlight is yours for the taking.</p>
 
-<p>Thirteen HD widescreens for the big game, professional pool tables, darts, pinball and electronic game machines. Surround sound from the Music Box, an outdoor patio with heaters and misters, and a hundred camera-secured parking spaces right in front.</p>
+<p>Thirteen HD widescreens for the big game, professional pool tables, darts, pinball and electronic game machines. Surround sound from the Music Box, a heated outdoor patio with misters for summer, and a hundred camera-secured parking spaces right in front.</p>
+
+<h2>What's on through the week</h2>
+<ul>
+<li><strong>Karaoke</strong> Wednesday through Saturday, 9pm to 1:30am, no cover.</li>
+<li><strong>Bingo</strong> every Tuesday at 7:30pm, free to play.</li>
+<li><strong>8-ball pool tournament</strong> every Saturday at 3pm, $10 buy-in, winner takes all.</li>
+<li><strong>Live bands and DJs</strong> most weekends &mdash; see the calendar for who's playing.</li>
+<li><strong>Every game</strong> &mdash; NFL, MLB, NBA, NCAA, soccer and golf on satellite.</li>
+</ul>
 
 <h2>Getting here</h2>
-<p>One block north of Mather Field Rd, off exit 15 on Highway 50. Easy on, easy off &mdash; no crawling through city traffic to get to us.</p>
+<p>We're the easiest bar in Sacramento County to get to. One block north of Mather Field Rd, off exit 15 on Highway 50 &mdash; easy on, easy off, and no crawling through city traffic. Free parking out front, a hundred spaces, all on camera.</p>
+
+<h2>Booking the venue</h2>
+<p>Louie's hosts birthdays, celebrations of life, club runs, car shows and company parties. If you're a band or a KJ looking for a room in the Sacramento area, get in touch &mdash; we book live entertainment most weeks.</p>
 
 <h2>Club rules</h2>
 <ul>
@@ -127,7 +139,7 @@ seed_page( 'about', 'About Us', <<<'HTML'
 <li>No tank tops on men.</li>
 </ul>
 
-<p>We reserve the right to refuse service or entry to anyone.</p>
+<p>We reserve the right to refuse service or entry to anyone. Must be 21 or over.</p>
 
 <h2>Also good to know</h2>
 <ul>
@@ -138,6 +150,8 @@ seed_page( 'about', 'About Us', <<<'HTML'
 HTML );
 
 seed_page( 'contact', 'Contact & Venue Hire', "<p>Quickest way to reach us is the phone &mdash; someone behind the bar will pick up. Booking a party, pitching a band, or asking about the patio? Use the form and we'll come back to you.</p>", 'page-contact.php' );
+
+seed_page( 'gallery', 'Photos', "<p>The bar, the pool room, karaoke nights and live music at Louie's Cocktail Lounge in Rancho Cordova.</p>", 'page-gallery.php' );
 
 seed_page( 'privacy-policy', 'Privacy Policy', "<p>We collect only what you send us through the contact form on this site: your name, email address, phone number if you give one, and your message. We use it to reply to you and nothing else. We do not sell it, share it or add you to a mailing list.</p><p>This site uses no advertising or tracking cookies. Embedded Google Maps is provided by Google and subject to their own privacy policy.</p><p>Want your details removed from our records? Call the bar and ask.</p>" );
 
@@ -153,7 +167,9 @@ update_option( 'permalink_structure', '/%postname%/' );
 
 // ------------------------------------------------------------- bar details ---
 
-update_option( 'louies_settings', array(
+// Merge rather than overwrite - image IDs differ per install and must survive
+// a re-run of this script.
+$louies_settings = array_merge( (array) get_option( 'louies_settings', array() ), array(
 	'phone'      => '(916) 362-9151',
 	'address_1'  => '3030 Mather Field Rd.',
 	'address_2'  => 'Rancho Cordova, CA 95670',
@@ -162,9 +178,10 @@ update_option( 'louies_settings', array(
 	'maps_query' => '3030 Mather Field Rd, Rancho Cordova, CA 95670',
 	'facebook'   => '',
 	'instagram'  => '',
-	'email'      => 'info@louiescocktaillounge.net',
+	'email'      => 'info@louiescocktails.com',
 	'notice'     => '',
 ) );
+update_option( 'louies_settings', $louies_settings );
 
 // ------------------------------------------------------------ event types ---
 
