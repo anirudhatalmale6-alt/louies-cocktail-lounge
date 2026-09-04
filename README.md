@@ -83,6 +83,48 @@ the grid directly above it, and repeating them underneath just pushes the one
 date that is actually news off the screen. If nothing is booked, the section
 says so rather than padding itself out with karaoke.
 
+## The karaoke band at the top of the home page
+
+Karaoke leads the page, above everything else, because it is what Louie's is
+best known for and it was previously reaching people as one word in the hero
+tag list.
+
+**Nothing in that band is typed into the template.** The nights, the times and
+the links are all read from the karaoke events themselves — the four
+*Wednesday/Thursday/Friday/Saturday Night Karaoke* posts, the ones with the
+**Karaoke** event type and *Every week* ticked. So:
+
+* Add a fifth karaoke night in **Events** and a fifth chip appears.
+* Move karaoke to 8:30pm and the band says 8:30pm.
+* Unpublish all four and the band disappears entirely, rather than promising
+  karaoke the bar has stopped running.
+
+The one thing that is written by hand is the paragraph ("Some of the best KJs
+in Sacramento…"), which is copy, not data. It lives in
+`wp-content/themes/louies/parts/karaoke.php`.
+
+**Swap the photo** in **Bar Details → Karaoke photo (media ID)**. Upload a new
+picture to Media, open it, copy the number out of the URL, paste it in. A
+landscape shot of someone on the stage works best.
+
+### The line on the photo
+
+It reads one of three ways, and it changes on its own:
+
+* **"Karaoke is on right now — the mic is open"**, lit teal, while it is
+  actually running.
+* **"Karaoke tonight from 9:00 pm"** on a karaoke day before it starts.
+* **"Next karaoke: Wednesday from 9:00 pm"** the rest of the week.
+
+Tonight's chip is highlighted too, so the day is readable at a glance.
+
+Two things this gets right that are easy to get wrong. Karaoke finishes at
+**1:30am**, so at 1am on a Saturday the singing that is happening belongs to
+*Friday* — the band says "on now", not "tonight from 9". And it is worked out
+**in the browser, in Rancho Cordova's timezone**, for exactly the reason the
+open/closed light is (see below): a cached page would otherwise sit there
+saying "Karaoke tonight" on a Monday.
+
 ## Changing the menu
 
 **Food & Drink.** Each item is a title plus a price. Group them with **Menu
@@ -134,6 +176,8 @@ for "Closed Thanksgiving" or "Kitchen closed tonight". Leave it blank to hide it
 * **The regular line-up** — the seven-day grid builds itself from the weekly
   events, with tonight highlighted. It cannot drift out of sync with the
   calendar because it *is* the calendar.
+* **The karaoke band** — nights, times, links and the "on now / tonight / next"
+  line, all off the karaoke events.
 
 ### Why the open/closed light is worked out in the browser
 
@@ -279,6 +323,32 @@ PHP 8, MySQL, free SSL.
 **Storage:** the whole site — WordPress, this theme, the plugin, and the images
 — is well under 200 MB. 13 GB is far more than enough; a few hundred
 full-resolution event posters would still leave most of it free.
+
+### Hostinger, if that's the one
+
+Prices as advertised on 4 September 2026 — check them at the till, they move.
+
+| Plan | Intro | Renews at | Storage | Sites |
+|---|---|---|---|---|
+| Premium | $2.99/mo | **$10.99/mo** | 20 GB | 3 |
+| Unlimited | $3.99/mo | $16.99/mo | 50 GB | unlimited |
+| Cloud Startup | $7.99/mo | $25.99/mo | 100 GB | unlimited |
+
+**Premium is the one.** The only real difference at the Unlimited tier is the
+number of *websites*, and Louie's has one. 20 GB against a site under 200 MB is
+already about a hundred times more room than it needs.
+
+Two things worth knowing before buying:
+
+* **The intro price is the 48-month price.** Shorter terms cost more per month.
+  Every host prices this way; it isn't a Hostinger quirk.
+* **The renewal is the real price.** Budget $10.99/mo, not $2.99/mo. Nothing is
+  locked in either — at renewal the whole site moves to another host in an
+  afternoon, because it is a normal theme and plugin with no licence attached.
+
+The free domain for the first year is worth taking **if `louiescocktails.com`
+isn't registered yet**. If it already is somewhere else, leave it there and
+just point the DNS.
 
 ## Notes
 

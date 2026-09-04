@@ -51,6 +51,12 @@ $gallery   = louies_gallery_photos( 8 );
 	</div>
 </section>
 
+<?php
+// Straight under the hero, above everything else. Karaoke is what this bar is
+// known for and it was reaching visitors as one word in the hero tag list.
+get_template_part( 'parts/karaoke' );
+?>
+
 <section class="fact-strip">
 	<div class="wrap">
 		<dl class="fact-cards">

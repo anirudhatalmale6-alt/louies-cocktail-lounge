@@ -130,6 +130,139 @@ function louies_timezone_name() {
 }
 
 /**
+ * The karaoke nights, read off the real events rather than typed into a
+ * template.
+ *
+ * Karaoke is the thing this bar is known for, so it gets its own band at the
+ * top of the home page - but the nights and times there must never disagree
+ * with the calendar underneath it. Adding a fifth karaoke night in the admin
+ * has to update the feature too, or the site starts lying about itself.
+ *
+ * Returns weekday number => array( start, end, post_id ), ordered Mon-Sun so
+ * the chips read the way a week does.
+ */
+function louies_karaoke_schedule() {
+	$term = get_term_by( 'slug', 'karaoke', 'louies_event_type' );
+	if ( ! $term || is_wp_error( $term ) ) {
+		return array();
+	}
+
+	$posts = get_posts( array(
+		'post_type'      => 'louies_event',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'no_found_rows'  => true,
+		'tax_query'      => array( array(
+			'taxonomy' => 'louies_event_type',
+			'field'    => 'term_id',
+			'terms'    => $term->term_id,
+		) ),
+		'meta_query'     => array( array( 'key' => '_louies_repeat', 'value' => 'weekly' ) ),
+	) );
+
+	$nights = array();
+	foreach ( $posts as $post ) {
+		$m = louies_event_meta( $post->ID );
+		foreach ( louies_weekday_list( $m['louies_weekdays'] ) as $d ) {
+			// First one wins if two karaoke events land on the same night -
+			// two chips for one Wednesday reads like a mistake.
+			if ( ! isset( $nights[ $d ] ) ) {
+				$nights[ $d ] = array(
+					'start'   => (string) $m['louies_time_start'],
+					'end'     => (string) $m['louies_time_end'],
+					'post_id' => (int) $post->ID,
+				);
+			}
+		}
+	}
+
+	// Monday first, Sunday last.
+	uksort( $nights, function ( $a, $b ) {
+		$order = array( 0 => 7, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6 );
+		return $order[ $a ] <=> $order[ $b ];
+	} );
+
+	return $nights;
+}
+
+/**
+ * Minutes past midnight for an "HH:MM" string, or null.
+ */
+function louies_minutes( $hhmm ) {
+	if ( ! preg_match( '/^([0-9]{1,2}):([0-9]{2})/', (string) $hhmm, $m ) ) {
+		return null;
+	}
+	return ( (int) $m[1] * 60 ) + (int) $m[2];
+}
+
+/**
+ * Which state the karaoke band should show: on now, on tonight, or next up.
+ *
+ * This is the FIRST GUESS, not the answer. The same calculation runs in the
+ * browser and overwrites it, because the moment this page is cached the value
+ * here freezes - see the note on louies_is_open_now(). Rendered anyway so the
+ * band says something sensible without JavaScript and to search engines.
+ *
+ * Returns array( state, day, start ) where state is on|tonight|next.
+ */
+function louies_karaoke_state( $nights = null, $dow = null, $minutes = null ) {
+	$nights = ( null === $nights ) ? louies_karaoke_schedule() : $nights;
+	if ( ! $nights ) {
+		return array( 'state' => 'none', 'day' => null, 'start' => '' );
+	}
+
+	$now     = current_datetime();
+	$dow     = ( null === $dow ) ? (int) $now->format( 'w' ) : (int) $dow;
+	$minutes = ( null === $minutes ) ? ( (int) $now->format( 'G' ) * 60 ) + (int) $now->format( 'i' ) : (int) $minutes;
+
+	foreach ( $nights as $d => $n ) {
+		$s = louies_minutes( $n['start'] );
+		$e = louies_minutes( $n['end'] );
+		if ( null === $s || null === $e ) {
+			continue;
+		}
+		// Karaoke finishes at 1:30am, so on a Saturday at 1am the singing that
+		// is actually happening belongs to FRIDAY. Checking only today's row
+		// would report "closed" during the busiest half hour of the week.
+		if ( $e <= $s ) {
+			if ( $d === $dow && $minutes >= $s ) {
+				return array( 'state' => 'on', 'day' => $d, 'start' => $n['start'] );
+			}
+			if ( ( ( $d + 1 ) % 7 ) === $dow && $minutes < $e ) {
+				return array( 'state' => 'on', 'day' => $d, 'start' => $n['start'] );
+			}
+		} elseif ( $d === $dow && $minutes >= $s && $minutes < $e ) {
+			return array( 'state' => 'on', 'day' => $d, 'start' => $n['start'] );
+		}
+	}
+
+	if ( isset( $nights[ $dow ] ) && $minutes < louies_minutes( $nights[ $dow ]['start'] ) ) {
+		return array( 'state' => 'tonight', 'day' => $dow, 'start' => $nights[ $dow ]['start'] );
+	}
+
+	for ( $i = 1; $i <= 7; $i++ ) {
+		$d = ( $dow + $i ) % 7;
+		if ( isset( $nights[ $d ] ) ) {
+			return array( 'state' => 'next', 'day' => $d, 'start' => $nights[ $d ]['start'] );
+		}
+	}
+
+	return array( 'state' => 'none', 'day' => null, 'start' => '' );
+}
+
+/**
+ * "9:00pm" from "21:00". Uses the site's own time format so a bar that prefers
+ * 24-hour clock gets it everywhere at once.
+ */
+function louies_clock( $hhmm ) {
+	$min = louies_minutes( $hhmm );
+	if ( null === $min ) {
+		return '';
+	}
+	return louies_format_time( $hhmm, '' );
+}
+
+/**
  * What's on today, so the front page can lead with it.
  */
 function louies_tonight() {

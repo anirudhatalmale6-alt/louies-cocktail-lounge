@@ -254,6 +254,73 @@ t_ok( 'there are two happy hours a day', count( $windows ), 2 );
 t_ok( 'the morning one is 6am to 10am', implode( '-', $windows[0] ), '06:00-10:00' );
 t_ok( 'the evening one is 4pm to 7pm', implode( '-', $windows[1] ), '16:00-19:00' );
 
+// ---------------------------------------------------------------------------
+// The karaoke band.
+//
+// It leads the home page, so a wrong answer here is the first thing a customer
+// reads. The schedule is taken from the karaoke events themselves rather than
+// typed into the template, and the state has the same midnight wrap as the
+// open/closed light: at 1am on a Saturday the karaoke that is actually running
+// is FRIDAY's. Every case below is passed an explicit day and minute so it
+// tests the logic rather than whatever time the suite happens to run at.
+//
+// This logic exists a second time in assets/js/main.js, which is what a
+// visitor's browser runs. Keep the two honest against each other.
+// ---------------------------------------------------------------------------
+
+WP_CLI::log( "\nKaraoke" );
+
+$k = louies_karaoke_schedule();
+
+t_ok( 'karaoke runs four nights', count( $k ), 4 );
+t_ok( 'and they are Wed, Thu, Fri, Sat', implode( ',', array_keys( $k ) ), '3,4,5,6' );
+t_ok( 'every night starts at 9pm', implode( ',', wp_list_pluck( $k, 'start' ) ), '21:00,21:00,21:00,21:00' );
+t_ok( 'every night ends at 1:30am', implode( ',', wp_list_pluck( $k, 'end' ) ), '01:30,01:30,01:30,01:30' );
+
+// Every chip has to link somewhere real, or four dead links lead the page.
+$linked = 0;
+foreach ( $k as $n ) {
+	if ( $n['post_id'] && get_permalink( $n['post_id'] ) ) {
+		$linked++;
+	}
+}
+t_ok( 'each night links to its own event', $linked, 4 );
+
+$st = function ( $dow, $hhmm ) use ( $k ) {
+	$s = louies_karaoke_state( $k, $dow, louies_minutes( $hhmm ) );
+	return $s['state'] . ':' . ( null === $s['day'] ? '-' : $s['day'] );
+};
+
+// Wednesday, the first karaoke night of the week.
+t_ok( 'Wed 8:59pm is not on yet',       $st( 3, '20:59' ), 'tonight:3' );
+t_ok( 'Wed 9:00pm is on',               $st( 3, '21:00' ), 'on:3' );
+t_ok( 'Wed 11:30pm is on',              $st( 3, '23:30' ), 'on:3' );
+
+// Past midnight. The browser has already ticked over to Thursday, but the
+// singing belongs to Wednesday.
+t_ok( 'Thu 12:30am is still Wednesday', $st( 4, '00:30' ), 'on:3' );
+t_ok( 'Thu 1:29am is still Wednesday',  $st( 4, '01:29' ), 'on:3' );
+t_ok( 'Thu 1:30am has finished',        $st( 4, '01:30' ), 'tonight:4' );
+t_ok( 'Thu 2:00pm is on tonight',       $st( 4, '14:00' ), 'tonight:4' );
+
+// The last night wraps into a day with no karaoke of its own.
+t_ok( 'Sun 1:00am is still Saturday',   $st( 0, '01:00' ), 'on:6' );
+t_ok( 'Sun 1:30am has finished',        $st( 0, '01:30' ), 'next:3' );
+
+// The quiet half of the week, where the answer is a future day and never
+// "tonight". Getting this wrong would put "Karaoke tonight" on a Monday.
+t_ok( 'Sun 8:00pm points at Wednesday', $st( 0, '20:00' ), 'next:3' );
+t_ok( 'Mon 8:00pm points at Wednesday', $st( 1, '20:00' ), 'next:3' );
+t_ok( 'Tue 11:00pm points at Wednesday', $st( 2, '23:00' ), 'next:3' );
+
+// Saturday night rolls forward to Wednesday, not backwards to Wednesday past.
+t_ok( 'Sat 8:00pm is on tonight',       $st( 6, '20:00' ), 'tonight:6' );
+t_ok( 'Sat 11:00pm is on',              $st( 6, '23:00' ), 'on:6' );
+
+// And with nothing published there must be no band at all rather than an
+// empty promise on the busiest part of the page.
+t_ok( 'no karaoke events means no state', louies_karaoke_state( array(), 3, 1260 )['state'], 'none' );
+
 // A self-check on the harness itself. If this run reported nothing at all, the
 // counters are broken again and a green result would mean nothing.
 if ( 0 === $GLOBALS['t_pass'] + $GLOBALS['t_fail'] ) {

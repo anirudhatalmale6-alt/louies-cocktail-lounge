@@ -27,9 +27,28 @@ cp -r "$SITE/wp-content/uploads" "$OUT/wp-content/uploads"
 cp -r "$SITE/wp-content/themes/louies/assets" "$OUT/wp-content/themes/louies/assets"
 
 # Every event that is actually published, so the "Details" links work.
+#
+# This used to end in `2>/dev/null || true`, which meant that when wp-cli wasn't
+# on PATH the command failed, the error went to /dev/null, the loop read nothing
+# and the build carried on and reported success - having produced a preview in
+# which every single "Details" button was a 404. A silent zero is the worst
+# possible outcome here, so the count is now checked.
+WP="${WP:-wp}"
+EVENT_SLUGS="$( cd "$SITE" && $WP post list --post_type=louies_event --post_status=publish --field=post_name )" || {
+	echo "ERROR: could not list events - is wp-cli on PATH? Set WP=\"php /path/to/wp\"." >&2
+	exit 1
+}
+
 while read -r slug; do
 	[ -n "$slug" ] && PAGES+=( "event/$slug/" )
-done < <(cd "$SITE" && "${WP:-wp}" post list --post_type=louies_event --post_status=publish --field=post_name 2>/dev/null || true)
+done <<< "$EVENT_SLUGS"
+
+EVENT_COUNT=$(( ${#PAGES[@]} - 8 ))
+if [ "$EVENT_COUNT" -lt 1 ]; then
+	echo "ERROR: no published events found. The preview would ship with every Details link broken." >&2
+	exit 1
+fi
+echo "found $EVENT_COUNT published events"
 
 rewrite() {
 	python3 - "$1" "$SRC" "$PREFIX" <<'PY'

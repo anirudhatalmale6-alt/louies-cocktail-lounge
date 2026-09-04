@@ -183,4 +183,13 @@ if ( isset( $photo_ids['louies-packed-house'] ) ) {
 	louies_set_option( 'private_image_id', $photo_ids['louies-packed-house'] );
 }
 
+// The karaoke band at the top of the home page. This one is not in $photo_ids
+// because it came off the old site rather than out of the phone photos, so it
+// is looked up by slug - and left alone if the bar has already chosen its own.
+$karaoke = get_page_by_path( 'the-karaoke-stage', OBJECT, 'attachment' );
+if ( $karaoke && ! trim( (string) louies_option( 'karaoke_image_id' ) ) ) {
+	louies_set_option( 'karaoke_image_id', (int) $karaoke->ID );
+	WP_CLI::log( sprintf( 'karaoke photo -> #%d', $karaoke->ID ) );
+}
+
 WP_CLI::success( sprintf( 'media done: %d photos, gallery set', count( $photo_ids ) ) );
