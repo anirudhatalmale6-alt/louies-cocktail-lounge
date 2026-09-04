@@ -308,7 +308,31 @@ seed_event( 'geo-jam', "Geo Jam Open Mic", array(
 // section. Everything else on the site is a weekly or monthly repeat and looks
 // after itself.
 //
-// (Nothing booked as of 03/09/2026 beyond the monthly Geo Jam above.)
+// Both of these came off flyers the bar sent on 03/09/2026. Every fact below is
+// read off the artwork - nothing is filled in from assumption. Where the flyer
+// is silent (Mr. Purple says nothing about a cover charge) the field is left
+// empty rather than guessed at, because "FREE" on a website is a promise the
+// door staff have to keep.
+
+seed_event( 'mr-purple', "Mr. Purple", array(
+	'louies_date'       => '2026-09-12',
+	'louies_time_start' => '15:00',
+	'louies_time_end'   => '18:00',
+	'louies_price'      => '',
+), "<p>Mr. Purple play the afternoon slot - Kris, Slinger and Jeff, three hours of live rock from 3pm.</p>", array( 'Live Music' ) );
+
+// "5:00PM - UNTIL" on the flyer, so there is deliberately no end time set.
+// The two entry fees are different things and the site has to keep them apart:
+// $20 to cook, $10 to judge. Getting that backwards costs somebody money.
+seed_event( 'chili-cook-off', "Chili Cook-Off", array(
+	'louies_date'       => '2026-09-25',
+	'louies_time_start' => '17:00',
+	'louies_time_end'   => '',
+	'louies_price'      => '$20 to enter &middot; $10 to judge',
+), "<p>Raffles, friends, music and fun - and a pot of chili with your name on it.</p>"
+ . "<p><strong>Cooking?</strong> Entry is $20 and you need to RSVP by <strong>Sunday 20 September</strong>. Speak to Janene to pay and get your spot.</p>"
+ . "<p><strong>Judging?</strong> $10 on the day. Cornbread gets judged too, so bring that as well if you have a recipe worth defending.</p>",
+	array( 'Special Event' ) );
 
 // Taken down 03/09/2026 - these were recovered from old archived pages and are
 // not on the books. Named explicitly so a second run of this script removes

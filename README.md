@@ -92,18 +92,29 @@ Use the *Order* field to move an item up or down within its section.
 A section where no item has a price renders as a tidy multi-column bottle list
 instead of a price list — that's how the back-bar spirits display.
 
-## The league badges on the game-day section
+## The league logos on the game-day section
 
-NFL, NCAA, NBA, MLB and FIFA appear as **typeset badges in the bar's own
-colours, not the leagues' official logos**. Those logos are registered
-trademarks; naming a league to say which games you show is ordinary use, but
-reproducing its artwork on a commercial site is not something to do without a
-licence, so the site doesn't.
+Each league on the "On the screens" row shows **an uploaded logo if Bar Details
+has a media ID for it, and a typeset badge in the bar's own colours if not**.
+Nothing is hard-coded into the theme.
 
-If Louie's is supplied official artwork — distributors and satellite providers
-often give bars a media pack — upload each file and paste its media ID into
-**Bar Details → NFL logo** and so on. The badge is replaced by the image and
-nothing else changes. Leave the fields blank and the typeset badges stay.
+As shipped: NFL, NBA, MLB and NHL use logo files supplied by the bar on
+3 September 2026, cut out of the sheet it sent. NCAA and FIFA are still typeset
+badges because no artwork was supplied for them.
+
+**To change one:** upload the image, copy its media ID, paste it into
+**Bar Details → NFL logo (media ID)** and so on. **To remove one:** clear that
+field and the typeset badge comes back. One field, reversible, no code.
+
+On the trademark question, which hasn't changed: these are registered marks.
+Naming a league — "we show NFL games" — is ordinary descriptive use and is
+fine. Reproducing the artwork is a different thing, and whether to do it is the
+bar's call, which is exactly why it lives in a settings field rather than in
+the theme.
+
+Logos sit on a **white plaque**. Several of these marks are largely white
+themselves — the NFL shield and the MLB batter are both white shapes — so
+dropping them straight onto the dark band would lose half of each one.
 
 ## Phone, address, hours
 
@@ -117,12 +128,44 @@ for "Closed Thanksgiving" or "Kitchen closed tonight". Leave it blank to hide it
 
 ## What's automatic
 
-* **Open now / Closed** in the header, from the bar's hours.
+* **Open now / Closed** in the header, from the bar's hours — see below.
 * **Happy hour is on right now** on the front page, during either window.
 * **Tonight at Louie's** — whatever is actually booked for today.
 * **The regular line-up** — the seven-day grid builds itself from the weekly
   events, with tonight highlighted. It cannot drift out of sync with the
   calendar because it *is* the calendar.
+
+### Why the open/closed light is worked out in the browser
+
+It would be simpler to decide "open or closed" on the server while building the
+page. That is what it used to do, and it was **wrong** — the bar reported the
+site saying *Closed* on an evening it was open.
+
+The reason is that a built page gets **kept**. Hosts put a page cache in front
+of WordPress, CDNs hold copies, and the static preview is flat files with no PHP
+at all. Whatever the light said at the moment the page was generated is what
+every later visitor sees. A page built at 3am says "Closed" until something
+clears the cache.
+
+So the decision moved into `assets/js/main.js`, which re-checks it on load and
+every minute after. Two consequences worth knowing:
+
+* It is **pinned to the bar's timezone** (`America/Los_Angeles`), not the
+  viewer's. Someone looking the bar up from another state sees whether *Louie's*
+  is open, not whether it would be open where they are standing.
+* The happy-hour flag is **always in the HTML** and switched on with a class,
+  rather than only being printed when it applies. A conditional render cannot be
+  corrected after a cache has frozen it: if the element isn't there, there is
+  nothing for the browser to switch on.
+
+PHP still renders a first guess, because that is the correct fallback with
+JavaScript off and it is what search engines read. The hours live in one place
+(`louies_open_time()` / `louies_close_time()`) and are handed to the browser as
+data attributes, so the two can't disagree.
+
+The trading window **wraps past midnight** — 6am to 2am — so the obvious test
+("after opening AND before closing") is false for every hour the bar is
+actually busy. Both implementations handle the wrap, and the test suite pins it.
 
 ---
 
@@ -220,10 +263,18 @@ in **Bar Details → Contact email**.
 
 ## Hosting
 
-WordPress.com's cheaper plans **cannot run this**. Custom themes and plugins
-need their **Business** plan (about $300/year billed annually). Everything here
-is a normal WordPress theme and plugin, so any host that gives you real
-WordPress will do — a $5–12/month plan from a normal host runs it comfortably.
+WordPress.com's cheaper plans — Free, Personal, Premium — **cannot run this**.
+They only allow themes and plugins from their own catalogue. Custom code needs
+their **Business** plan (about $300/year billed annually), which is also where
+their SFTP / SSH / WP-CLI / GitHub Deployments bundle appears. That list isn't
+a requirement in itself; it's just the marker of the tier that can run custom
+code at all. Of it, only **SFTP** actually matters — that's how the theme and
+plugin get installed.
+
+Everything here is a normal WordPress theme and plugin, so any host that gives
+you real WordPress will do — a $5–12/month plan runs it comfortably, at about a
+fifth of the price. Look for: cPanel or similar, SFTP or file-manager access,
+PHP 8, MySQL, free SSL.
 
 **Storage:** the whole site — WordPress, this theme, the plugin, and the images
 — is well under 200 MB. 13 GB is far more than enough; a few hundred

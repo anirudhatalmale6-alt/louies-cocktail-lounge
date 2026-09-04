@@ -33,6 +33,7 @@ function louies_settings_fields() {
 		'league_ncaa_id' => array( 'NCAA logo (media ID)', '', 'Optional.' ),
 		'league_nba_id'  => array( 'NBA logo (media ID)', '', 'Optional.' ),
 		'league_mlb_id'  => array( 'MLB logo (media ID)', '', 'Optional.' ),
+		'league_nhl_id'  => array( 'NHL logo (media ID)', '', 'Optional.' ),
 		'league_fifa_id' => array( 'FIFA logo (media ID)', '', 'Optional.' ),
 		'seo_tagline'  => array( 'Search description', 'Karaoke Wednesday to Saturday, live music, bingo, pool and every game on 13 screens. Two happy hours daily. Rancho Cordova, one block off Highway 50.', 'The sentence Google shows under the site name. Aim for 150-160 characters.' ),
 	);

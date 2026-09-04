@@ -41,12 +41,43 @@ add_action( 'wp_head', function () {
 }, 1 );
 
 /**
+ * The trading hours the open/closed light runs off, as "HH:MM".
+ *
+ * Separate little functions because these two values are needed in two places
+ * that must not be allowed to disagree: PHP renders the light server-side, and
+ * the same numbers get handed to the browser as data attributes so JavaScript
+ * can re-check it. One source, two consumers.
+ */
+function louies_open_time() {
+	return (string) apply_filters( 'louies_open_time', '06:00' );
+}
+
+function louies_close_time() {
+	return (string) apply_filters( 'louies_close_time', '02:00' );
+}
+
+/**
+ * The happy hour windows, as pairs of "HH:MM".
+ */
+function louies_happy_hours() {
+	return (array) apply_filters( 'louies_happy_hours', array( array( '06:00', '10:00' ), array( '16:00', '19:00' ) ) );
+}
+
+/**
  * Is the bar open right now? Hours are stored as plain text for the humans,
  * so the open/closed light reads from a separate pair of times.
+ *
+ * NOTE: this answer is only true at the moment the page is BUILT. Almost every
+ * host puts a page cache in front of WordPress, and the static preview is flat
+ * files, so a server-rendered light gets frozen at whatever it said when the
+ * page was generated - which is how the bar ended up advertising "Closed" all
+ * evening. This still runs, because it is the correct no-JavaScript fallback
+ * and it is what search engines read, but assets/js/main.js re-checks it in the
+ * browser and corrects it. Treat this as the first guess, not the answer.
  */
 function louies_is_open_now() {
-	$open  = apply_filters( 'louies_open_time', '06:00' );
-	$close = apply_filters( 'louies_close_time', '02:00' );
+	$open  = louies_open_time();
+	$close = louies_close_time();
 
 	$now     = current_datetime();
 	$minutes = ( (int) $now->format( 'G' ) * 60 ) + (int) $now->format( 'i' );
@@ -67,7 +98,7 @@ function louies_is_open_now() {
  * Happy hour windows, for the little "on now" flag.
  */
 function louies_is_happy_hour() {
-	$windows = apply_filters( 'louies_happy_hours', array( array( '06:00', '10:00' ), array( '16:00', '19:00' ) ) );
+	$windows = louies_happy_hours();
 	$now     = current_datetime();
 	$minutes = ( (int) $now->format( 'G' ) * 60 ) + (int) $now->format( 'i' );
 
@@ -79,6 +110,23 @@ function louies_is_happy_hour() {
 		}
 	}
 	return false;
+}
+
+/**
+ * The bar's timezone as an IANA name the browser's Intl API will accept, or ''.
+ *
+ * WordPress lets a site be configured with a bare UTC offset ("UTC+5:30")
+ * instead of a real zone, and wp_timezone_string() then hands back "+05:30".
+ * Intl.DateTimeFormat rejects that, so return nothing rather than something
+ * that will throw - the JavaScript falls back to what PHP rendered.
+ *
+ * An offset would be the wrong answer here anyway: Rancho Cordova moves an hour
+ * twice a year, and a hard-coded -08:00 would have the bar opening at 7am for
+ * eight months of the year.
+ */
+function louies_timezone_name() {
+	$tz = wp_timezone_string();
+	return ( false !== strpos( $tz, '/' ) ) ? $tz : '';
 }
 
 /**

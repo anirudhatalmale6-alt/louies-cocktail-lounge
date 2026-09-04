@@ -162,12 +162,97 @@ if ( $sun ) {
 	t_ok( 'and it lands in the sunday column', $names, array( 'Sunday Football Games and Pool' ) );
 }
 
+// "Next up" is one-offs and monthlies only, in date order, and NOTHING else.
+// Asserting the exact list rather than "contains Geo Jam" is the point: the bug
+// this catches is the section quietly refilling itself with the weekly regulars
+// that are already listed in the grid above it, and a contains-check would sail
+// straight past that. Update this list when the bar books something new - a
+// failure here on the day an event is added is the test doing its job.
 $next = louies_get_occurrences( '2026-09-03', '2027-03-31', array( 'unique' => true, 'skip_weekly' => true, 'limit' => 6 ) );
 t_ok(
-	'"next up" holds only geo jam',
+	'"next up" holds exactly the booked one-offs, in date order',
 	array_map( function ( $o ) { return $o['post']->post_title . ' ' . $o['date']; }, $next ),
-	array( 'Geo Jam Open Mic 2026-09-26' )
+	array(
+		'Mr. Purple 2026-09-12',
+		'Chili Cook-Off 2026-09-25',
+		'Geo Jam Open Mic 2026-09-26',
+	)
 );
+
+// The two September flyers, checked field by field against the artwork. These
+// dates were read off a photograph, and a transcription slip puts the bar's
+// customers outside a locked door on the wrong evening.
+$purple = get_posts( array( 'post_type' => 'louies_event', 'name' => 'mr-purple', 'posts_per_page' => 1 ) );
+t_ok( 'mr purple is on the books', $purple ? 'yes' : 'no', 'yes' );
+if ( $purple ) {
+	$m = louies_event_meta( $purple[0]->ID );
+	t_ok( 'mr purple is the saturday on the flyer', $m['louies_date'] . ' ' . gmdate( 'D', strtotime( $m['louies_date'] ) ), '2026-09-12 Sat' );
+	t_ok( 'mr purple runs 3pm to 6pm', $m['louies_time_start'] . '-' . $m['louies_time_end'], '15:00-18:00' );
+	t_ok( 'mr purple claims no cover charge it cannot back up', $m['louies_price'], '' );
+	t_ok( 'mr purple has its poster', has_post_thumbnail( $purple[0]->ID ) ? 'yes' : 'no', 'yes' );
+}
+
+$chili = get_posts( array( 'post_type' => 'louies_event', 'name' => 'chili-cook-off', 'posts_per_page' => 1 ) );
+t_ok( 'the chili cook-off is on the books', $chili ? 'yes' : 'no', 'yes' );
+if ( $chili ) {
+	$m = louies_event_meta( $chili[0]->ID );
+	t_ok( 'the cook-off is 25 september', $m['louies_date'], '2026-09-25' );
+	t_ok( 'the cook-off starts at 5pm', $m['louies_time_start'], '17:00' );
+	// The flyer says "5:00PM - UNTIL", so an end time would be invented.
+	t_ok( 'the cook-off has no invented finish time', $m['louies_time_end'], '' );
+	t_ok( 'the cook-off keeps the two fees apart', $m['louies_price'], '$20 to enter &middot; $10 to judge' );
+}
+
+// ---------------------------------------------------------------------------
+// The open / closed light.
+//
+// Louie's shuts at 2am, so the trading window runs PAST MIDNIGHT and the
+// obvious test - "is it after opening and before closing?" - is false for every
+// hour the bar is actually busy. These pin the wrap-around branch. The same
+// rule is implemented a second time in assets/js/main.js, which is what the
+// browser actually runs; keep the two honest against each other.
+// ---------------------------------------------------------------------------
+
+WP_CLI::log( "\nOpen / closed" );
+
+t_ok( 'the bar opens at 6am', louies_open_time(), '06:00' );
+t_ok( 'the bar closes at 2am', louies_close_time(), '02:00' );
+
+// A real zone name, not a bare offset. An offset would be frozen at whatever
+// half of the year it was written in and would put the bar an hour out for the
+// other half.
+t_ok( 'the timezone is a real zone the browser can use', louies_timezone_name(), 'America/Los_Angeles' );
+
+// A window covering the whole day must report open whatever time this runs at.
+$always = function () { return '00:00'; };
+add_filter( 'louies_open_time', $always );
+add_filter( 'louies_close_time', $always );
+t_ok( 'a window that wraps a full day is always open', louies_is_open_now() ? 'open' : 'closed', 'open' );
+remove_filter( 'louies_open_time', $always );
+remove_filter( 'louies_close_time', $always );
+
+// And a one-minute window on the other side of the clock must report closed,
+// wrap-around or not.
+$now_min  = ( (int) current_datetime()->format( 'G' ) * 60 ) + (int) current_datetime()->format( 'i' );
+$far      = ( $now_min + 300 ) % 1440;               // five hours from now
+$far_open = sprintf( '%02d:%02d', intdiv( $far, 60 ), $far % 60 );
+$far_end  = sprintf( '%02d:%02d', intdiv( ( $far + 1 ) % 1440, 60 ), ( ( $far + 1 ) % 1440 ) % 60 );
+
+$o = function () use ( $far_open ) { return $far_open; };
+$c = function () use ( $far_end ) { return $far_end; };
+add_filter( 'louies_open_time', $o );
+add_filter( 'louies_close_time', $c );
+t_ok( 'a one-minute window elsewhere in the day is closed', louies_is_open_now() ? 'open' : 'closed', 'closed' );
+remove_filter( 'louies_open_time', $o );
+remove_filter( 'louies_close_time', $c );
+
+// The happy-hour flag has to be in the markup even when it is off, or a cached
+// page that was built outside happy hour has no element for the browser to
+// switch back on. Guard the shape of the data the template hands to the page.
+$windows = louies_happy_hours();
+t_ok( 'there are two happy hours a day', count( $windows ), 2 );
+t_ok( 'the morning one is 6am to 10am', implode( '-', $windows[0] ), '06:00-10:00' );
+t_ok( 'the evening one is 4pm to 7pm', implode( '-', $windows[1] ), '16:00-19:00' );
 
 // A self-check on the harness itself. If this run reported nothing at all, the
 // counters are broken again and a green result would mean nothing.

@@ -10,21 +10,23 @@ $bg = louies_photo_url( 'sports_image_id', 243, 'louies-hero' );
 /**
  * The leagues.
  *
- * These are typeset badges in the bar's own colours, not the leagues' official
- * logos. Those logos are registered trademarks and I'm not going to ship copies
- * of them on a commercial site without the bar having a licence - naming the
- * league to say which games you show is fine, reproducing its artwork is a
- * different thing.
+ * Each one shows an uploaded logo if Bar Details has an image ID for it, and a
+ * typeset badge in the bar's own colours if not. Nothing is hard-coded into the
+ * theme, so a logo can be swapped or pulled entirely from the admin screen
+ * without anyone editing this file.
  *
- * If Louie's is supplied artwork by a distributor and wants to use it, each
- * badge can be replaced with an uploaded image from Bar Details without
- * touching this file.
+ * On the trademark question, which has not changed: these are registered marks
+ * and reproducing them is not the same as naming them. Saying "we show NFL
+ * games" is ordinary descriptive use and is fine. Putting the shield on the
+ * page is the bar's call to make, which is why it is an upload and not
+ * something I baked in - it can be turned off by clearing one field.
  */
 $leagues = array(
 	array( 'key' => 'nfl',  'mark' => 'NFL',  'sport' => __( 'Pro football', 'louies' ) ),
 	array( 'key' => 'ncaa', 'mark' => 'NCAA', 'sport' => __( 'College', 'louies' ) ),
 	array( 'key' => 'nba',  'mark' => 'NBA',  'sport' => __( 'Basketball', 'louies' ) ),
 	array( 'key' => 'mlb',  'mark' => 'MLB',  'sport' => __( 'Baseball', 'louies' ) ),
+	array( 'key' => 'nhl',  'mark' => 'NHL',  'sport' => __( 'Hockey', 'louies' ) ),
 	array( 'key' => 'fifa', 'mark' => 'FIFA', 'sport' => __( 'Soccer', 'louies' ) ),
 );
 
@@ -86,14 +88,26 @@ $sports = array(
 			<?php
 			foreach ( $leagues as $l ) :
 				$custom = (int) louies_option( 'league_' . $l['key'] . '_id', 0 );
-				$img    = $custom ? wp_get_attachment_image_url( $custom, 'medium' ) : '';
+				// 'full' deliberately: these files are already small, and asking
+				// for 'medium' returns whatever WordPress happened to generate,
+				// which for an image under 300px is nothing at all.
+				$img    = $custom ? wp_get_attachment_image_url( $custom, 'full' ) : '';
 				?>
-				<li class="league league-<?php echo esc_attr( $l['key'] ); ?>">
-					<?php if ( $img ) : ?>
-						<img class="league-logo" src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $l['mark'] ); ?>" loading="lazy">
-					<?php else : ?>
-						<span class="league-mark"><?php echo esc_html( $l['mark'] ); ?></span>
-					<?php endif; ?>
+				<li class="league league-<?php echo esc_attr( $l['key'] ); ?><?php echo $img ? ' has-logo' : ''; ?>">
+					<?php
+					// Logos sit on a light plaque. These marks are drawn to be
+					// read on white and several of them are largely white
+					// themselves - the NFL shield and the MLB batter are both
+					// white shapes - so dropping them straight onto the dark
+					// band would lose half of each logo.
+					?>
+					<span class="league-chip">
+						<?php if ( $img ) : ?>
+							<img class="league-logo" src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $l['mark'] ); ?>" loading="lazy" decoding="async">
+						<?php else : ?>
+							<span class="league-mark"><?php echo esc_html( $l['mark'] ); ?></span>
+						<?php endif; ?>
+					</span>
 					<em><?php echo esc_html( $l['sport'] ); ?></em>
 				</li>
 			<?php endforeach; ?>

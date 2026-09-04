@@ -37,9 +37,23 @@
 		</nav>
 
 		<div class="header-actions">
-			<span class="status-pill <?php echo louies_is_open_now() ? 'is-open' : ''; ?>">
+			<?php
+			// Rendered server-side so it is correct without JavaScript and for
+			// anything that doesn't run scripts - but see louies_is_open_now():
+			// a cached page freezes this, so main.js re-checks it in the browser
+			// against the bar's own timezone. The hours ride along as data
+			// attributes so there is exactly one place they are defined.
+			$louies_open = louies_is_open_now();
+			?>
+			<span class="status-pill <?php echo $louies_open ? 'is-open' : ''; ?>"
+				data-louies-status
+				data-open="<?php echo esc_attr( louies_open_time() ); ?>"
+				data-close="<?php echo esc_attr( louies_close_time() ); ?>"
+				data-tz="<?php echo esc_attr( louies_timezone_name() ); ?>"
+				data-label-open="<?php esc_attr_e( 'Open now', 'louies' ); ?>"
+				data-label-closed="<?php esc_attr_e( 'Closed', 'louies' ); ?>">
 				<span class="status-dot"></span>
-				<?php echo louies_is_open_now() ? esc_html__( 'Open now', 'louies' ) : esc_html__( 'Closed', 'louies' ); ?>
+				<span class="status-text"><?php echo $louies_open ? esc_html__( 'Open now', 'louies' ) : esc_html__( 'Closed', 'louies' ); ?></span>
 			</span>
 
 			<a class="header-phone" href="<?php echo esc_url( louies_phone_link() ); ?>"><?php echo esc_html( louies_option( 'phone' ) ); ?></a>

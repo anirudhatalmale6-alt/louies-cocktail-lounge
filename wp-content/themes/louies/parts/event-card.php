@@ -10,14 +10,20 @@ if ( ! $o ) {
 	return;
 }
 
-$image = louies_event_image( $o['post_id'] );
+// 'large', not the hard-cropped card size. Event artwork arrives as portrait
+// flyers - a poster is taller than it is wide - and a 16:9 crop of one takes a
+// band out of the middle, losing the date off the top and the venue off the
+// bottom. The card shows the whole flyer instead and fills the gap at the sides
+// with a blurred copy of it.
+$image = louies_event_image( $o['post_id'], 'large' );
 $date  = DateTimeImmutable::createFromFormat( 'Y-m-d|', $o['date'], louies_timezone() );
 $label = louies_repeat_label( $o['meta'] );
 ?>
 <article class="event-card">
-	<div class="event-media">
+	<div class="event-media<?php echo $image ? ' has-poster' : ''; ?>">
 		<?php if ( $image ) : ?>
-			<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $o['post_id'] ) ); ?>" loading="lazy">
+			<img class="event-poster-bg" src="<?php echo esc_url( $image ); ?>" alt="" aria-hidden="true" loading="lazy" decoding="async">
+			<img class="event-poster" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( get_the_title( $o['post_id'] ) ); ?>" loading="lazy">
 		<?php else : ?>
 			<div class="event-media-empty"><span>Louie's</span></div>
 		<?php endif; ?>

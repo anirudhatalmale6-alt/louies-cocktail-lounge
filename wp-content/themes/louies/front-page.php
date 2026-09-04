@@ -110,9 +110,16 @@ $gallery   = louies_gallery_photos( 8 );
 				</p>
 			<?php endif; ?>
 
-			<?php if ( louies_is_happy_hour() ) : ?>
-				<span class="hh-flag"><?php esc_html_e( 'Happy hour is on right now', 'louies' ); ?></span>
-			<?php endif; ?>
+			<?php
+			// Always present in the markup, shown by the is-on class, rather than
+			// rendered conditionally. A conditional render cannot be corrected
+			// after the fact: once a cache has frozen a page that omitted this
+			// element, there is nothing left for JavaScript to switch on.
+			?>
+			<span class="hh-flag<?php echo louies_is_happy_hour() ? ' is-on' : ''; ?>"
+				data-louies-happy-hour
+				data-windows="<?php echo esc_attr( wp_json_encode( louies_happy_hours() ) ); ?>"
+				data-tz="<?php echo esc_attr( louies_timezone_name() ); ?>"><?php esc_html_e( 'Happy hour is on right now', 'louies' ); ?></span>
 		</div>
 	</div>
 </section>
