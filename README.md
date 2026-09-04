@@ -268,6 +268,30 @@ Verified from empty: a blank WordPress install plus these four commands
 reproduces the site exactly — 7 pages, 11 events, 172 menu items, 37 images,
 both navigation menus, no broken images and no console errors.
 
+### On shared hosting, where there is no WP-CLI
+
+Hostinger Premium has no SSH, so the four commands above cannot be typed. The
+same two scripts still run: upload this folder, then load them from a small
+throwaway PHP file that `require`s `wp-load.php` and defines a `WP_CLI` class
+with `log()`, `warning()` and `success()`. Those three methods are all the
+scripts use. Keeping one canonical copy of each script and shimming the runner
+is much safer than maintaining a second "hosting version" that would drift away
+from the tested one.
+
+Two things that will bite:
+
+* **`import-media.php` takes longer than the 60-second proxy timeout.** The
+  504 comes from nginx giving up on the response, *not* from PHP stopping — so
+  call `set_time_limit(0)` and `ignore_user_abort(true)` and write the log to a
+  file rather than to a connection nobody is listening to.
+* **Never start a second run to "retry" after that 504.** The first one is
+  still going. `louies_import()` sets the canonical `post_name` *after* the
+  sideload, so two overlapping runs both fail the slug check and import the same
+  file twice. Wait for `DONE` in the log, then compare the attachment count
+  against the 37 above.
+
+Delete the throwaway file, the upload archive and the log when finished.
+
 ---
 
 ## SEO

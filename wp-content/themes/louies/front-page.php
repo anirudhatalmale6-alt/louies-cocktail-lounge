@@ -166,8 +166,8 @@ get_template_part( 'parts/karaoke' );
 	<div class="wrap">
 		<div class="section-head section-head-row">
 			<div>
-				<p class="eyebrow"><?php esc_html_e( 'What\'s coming', 'louies' ); ?></p>
-				<h2><?php esc_html_e( 'Next up', 'louies' ); ?></h2>
+				<p class="eyebrow"><?php esc_html_e( 'Mark your calendar', 'louies' ); ?></p>
+				<h2><?php esc_html_e( 'Future events', 'louies' ); ?></h2>
 			</div>
 			<a class="btn btn-ghost btn-sm" href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'Full calendar', 'louies' ); ?></a>
 		</div>

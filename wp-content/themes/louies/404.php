@@ -10,7 +10,7 @@
 		<p class="lede"><?php esc_html_e( 'The bar is still here though. Try one of these:', 'louies' ); ?></p>
 		<div class="hero-actions">
 			<a class="btn" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'louies' ); ?></a>
-			<a class="btn btn-ghost" href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( "What's on", 'louies' ); ?></a>
+			<a class="btn btn-ghost" href="<?php echo esc_url( home_url( '/events/' ) ); ?>"><?php esc_html_e( 'Future events', 'louies' ); ?></a>
 			<a class="btn btn-ghost" href="<?php echo esc_url( home_url( '/menu/' ) ); ?>"><?php esc_html_e( 'Menu', 'louies' ); ?></a>
 			<a class="btn btn-ghost" href="<?php echo esc_url( louies_phone_link() ); ?>"><?php esc_html_e( 'Call us', 'louies' ); ?></a>
 		</div>

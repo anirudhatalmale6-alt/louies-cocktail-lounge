@@ -119,7 +119,7 @@ function seed_retire_item( $section_slug, $title ) {
 
 $home = seed_page( 'home', 'Home' );
 
-seed_page( 'events', "What's On", "Karaoke four nights a week, live bands, bingo, pool tournaments and the big fights. Everything below is what's actually booked.", 'page-events.php' );
+seed_page( 'events', 'Future Events', "Karaoke four nights a week, live bands, bingo, pool tournaments and the big fights. Everything below is what's actually booked.", 'page-events.php' );
 
 seed_page( 'menu', 'Food & Drink', "Two happy hours a day, a different special every night of the week, and a back bar that runs deeper than most places twice our size.", 'page-menu.php' );
 
@@ -473,7 +473,7 @@ function seed_menu( $slug, $name, $location, $items ) {
 
 seed_menu( 'primary', 'Primary', 'primary', array(
 	array( 'home', 'Home' ),
-	array( 'events', "What's On" ),
+	array( 'events', 'Future Events' ),
 	array( 'menu', 'Food & Drink' ),
 	array( 'gallery', 'Photos' ),
 	array( 'about', 'About Us' ),
@@ -483,7 +483,7 @@ seed_menu( 'primary', 'Primary', 'primary', array(
 
 seed_menu( 'footer', 'Footer', 'footer', array(
 	array( 'menu', 'Food & Drink' ),
-	array( 'events', "What's On" ),
+	array( 'events', 'Future Events' ),
 	array( 'about', 'About Us' ),
 	array( 'contact', 'Contact & Venue Hire' ),
 	array( 'privacy-policy', 'Privacy Policy' ),
