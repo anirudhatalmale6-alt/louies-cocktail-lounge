@@ -236,21 +236,37 @@ actually busy. Both implementations handle the wrap, and the test suite pins it.
    **Settings → Reading**: front page displays a static page → *Home*.
 7. **Appearance → Menus**: build the Primary and Footer menus.
 8. **Appearance → Customize → Site Identity**: upload the logo.
+9. **Media**: upload the photographs and posters, then point Bar Details at them.
 
-### Or seed it in one command
+### Or build the whole thing in four commands
 
-With [WP-CLI](https://wp-cli.org) on the server, from the WordPress root:
+With [WP-CLI](https://wp-cli.org) on the server, run these **from inside this
+folder** — the media script resolves `photos/`, `posters/`, `brand/` and
+`leagues/` against its own location, so it can sit anywhere:
 
 ```
-wp plugin activate louies-core
-wp theme activate louies
-wp eval-file seed.php
+wp --path=/path/to/wordpress plugin activate louies-core
+wp --path=/path/to/wordpress theme activate louies
+wp --path=/path/to/wordpress eval-file seed.php
+wp --path=/path/to/wordpress eval-file import-media.php
 ```
 
-That creates every page, assigns the templates, sets the front page, timezone and
-permalinks, and loads the events, drink specials, food menu and spirits list
-recovered from the archived site. It is safe to run twice — everything is matched
-on slug and updated in place rather than duplicated.
+`seed.php` creates every page, assigns the templates, sets the front page,
+timezone and permalinks, builds the Primary and Footer menus, and loads the
+events, drink specials, food menu and spirits list recovered from the archived
+site.
+
+`import-media.php` imports every photograph, flyer and league logo, sets the
+header logo, the home page background, the share image, the karaoke photo, the
+combo artwork and the gallery, and gives each event its poster.
+
+Both are safe to run twice. Everything is matched on slug and updated in place
+rather than duplicated, and the menus are only written when they are empty — so
+a re-run never undoes a menu the bar has since rearranged.
+
+Verified from empty: a blank WordPress install plus these four commands
+reproduces the site exactly — 7 pages, 11 events, 172 menu items, 37 images,
+both navigation menus, no broken images and no console errors.
 
 ---
 

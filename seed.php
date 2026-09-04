@@ -425,4 +425,70 @@ foreach ( $tequila as $i => $name ) {
 	seed_item( 'tequila', $name, '', '', $i );
 }
 
+// ------------------------------------------------------------------ menus ---
+// These were hand-built during the demo and so were missing from this script,
+// which meant a fresh install came up with no navigation at all. Items are only
+// written when the menu is empty, so re-running this never undoes a menu the
+// bar has since rearranged themselves.
+
+function seed_menu( $slug, $name, $location, $items ) {
+	$menu = wp_get_nav_menu_object( $slug );
+	if ( ! $menu ) {
+		$id   = wp_create_nav_menu( $name );
+		$menu = is_wp_error( $id ) ? null : wp_get_nav_menu_object( $id );
+	}
+	if ( ! $menu ) {
+		WP_CLI::warning( "could not create menu: {$slug}" );
+		return;
+	}
+
+	$locations              = (array) get_theme_mod( 'nav_menu_locations', array() );
+	$locations[ $location ] = (int) $menu->term_id;
+	set_theme_mod( 'nav_menu_locations', $locations );
+
+	$existing = wp_get_nav_menu_items( $menu->term_id );
+	if ( ! empty( $existing ) ) {
+		WP_CLI::log( sprintf( 'menu: %s already has %d items, left alone', $slug, count( $existing ) ) );
+		return;
+	}
+
+	foreach ( $items as $i => $item ) {
+		list( $page_slug, $label ) = $item;
+		$page = get_page_by_path( $page_slug );
+		if ( ! $page ) {
+			WP_CLI::warning( "menu {$slug}: no page '{$page_slug}'" );
+			continue;
+		}
+		wp_update_nav_menu_item( $menu->term_id, 0, array(
+			'menu-item-object-id' => $page->ID,
+			'menu-item-object'    => 'page',
+			'menu-item-type'      => 'post_type',
+			'menu-item-title'     => $label,
+			'menu-item-status'    => 'publish',
+			'menu-item-position'  => $i + 1,
+		) );
+	}
+	WP_CLI::log( sprintf( 'menu: %s built with %d items', $slug, count( $items ) ) );
+}
+
+seed_menu( 'primary', 'Primary', 'primary', array(
+	array( 'home', 'Home' ),
+	array( 'events', "What's On" ),
+	array( 'menu', 'Food & Drink' ),
+	array( 'gallery', 'Photos' ),
+	array( 'about', 'About Us' ),
+	array( 'contact', 'Contact' ),
+	array( 'private-events', 'Private Events' ),
+) );
+
+seed_menu( 'footer', 'Footer', 'footer', array(
+	array( 'menu', 'Food & Drink' ),
+	array( 'events', "What's On" ),
+	array( 'about', 'About Us' ),
+	array( 'contact', 'Contact & Venue Hire' ),
+	array( 'privacy-policy', 'Privacy Policy' ),
+	array( 'gallery', 'Photos' ),
+	array( 'private-events', 'Private Events' ),
+) );
+
 WP_CLI::success( 'Content seeded.' );
